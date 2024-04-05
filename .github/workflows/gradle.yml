@@ -27,7 +27,10 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-
+        
+    # Navigate to the directory containing the Gradle build file
+    - name: Navigate to project directory
+      run: cd api/ctt/
     # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
