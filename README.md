@@ -2,6 +2,9 @@
 
 # Collectors' Tune Tracker (CTT)
 
+* [Github **Pages* Site](https://adron.github.io/collectorstunetracker/)
+* [Github Repository](https://github.com/Adron/collectorstunetracker)
+
 The idea behind the CTT is to serve several key larger picture ideas behind enjoying, collecting, and learning about music, artists, performers, writers, and related persuits.
 
 1. Provide a simple interface to look up music, musicians, artists, performers, writers, and related people involved in the community/industry.
