@@ -1,3 +1,5 @@
+[![Java CI with Gradle](https://github.com/Adron/collectorstunetracker/actions/workflows/gradle.yml/badge.svg)](https://github.com/Adron/collectorstunetracker/actions/workflows/gradle.yml)
+
 ![Github Ident](https://github.com/Adron/collectorstunetracker/blob/collectors_tracker_docs/graphics/logo/github-banner/5.png)
 
 # Collectors' Tune Tracker (CTT)
