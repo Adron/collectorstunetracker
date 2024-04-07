@@ -1,4 +1,6 @@
-![Full raw path](https://raw.githubusercontent.com/Adron/collectorstunetracker/3d10368804497550b04cd9f10f425991e0a05c3f/graphics/logo-animated/1.gif)
+![[Full raw path](https://raw.githubusercontent.com/Adron/collectorstunetracker/3d10368804497550b04cd9f10f425991e0a05c3f/graphics/logo-animated/1.gif)]
+
+![Github Ident](https://github.com/Adron/collectorstunetracker/blob/collectors_tracker_docs/graphics/logo/github-banner/5.png)
 
 # Collectors' Tune Tracker (CTT)
 
