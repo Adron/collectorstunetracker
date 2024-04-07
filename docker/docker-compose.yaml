@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  ctt-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ctt
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret!
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data_ctt
+    restart: always
+volumes:
+  postgres_data:
