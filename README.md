@@ -1,6 +1,6 @@
 [![pages-build-deployment](https://github.com/Adron/collectorstunetracker/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Adron/collectorstunetracker/actions/workflows/pages/pages-build-deployment)
 
-![Github Ident](https://github.com/Adron/collectorstunetracker/blob/collectors_tracker_docs/graphics/logo/github-banner/5.png)
+![Github Ident](https://github.com/Adron/collectorstunetracker/raw/collectors_tracker_docs/graphics/logo/github-banner/5.png)
 
 # Collectors' Tune Tracker (CTT)
 
