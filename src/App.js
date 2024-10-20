@@ -1,10 +1,40 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Login from './components/Login';
+import About from './components/About';
+import Collections from './components/Collections';
 
 function App() {
   return (
-    <div>
-      <h1>Heyo!  🤘🏻</h1>
-    </div>
+    <Router>
+      <div>
+      
+
+        <Routes>
+          <Route path="/" element={<h1>Welcome to Collector's Tune Tracker</h1>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/collections" element={<Collections />} />
+        </Routes>
+
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/collections">Collections</Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </Router>
   );
 }
 
