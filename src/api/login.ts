@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs'; // For password comparison
-import { db } from '../'; // Import the Kysely setup
+import { db } from '../db'; // Import the Kysely setup
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { username, password } = req.body;

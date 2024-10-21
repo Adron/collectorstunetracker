@@ -1,4 +1,5 @@
-import { Kysely, PostgresDialect } from '@vercel/postgres-kysely';
+import { Kysely } from 'kysely';
+import { PostgresDialect } from 'kysely';
 import { Pool } from '@vercel/postgres';
 
 interface User {
