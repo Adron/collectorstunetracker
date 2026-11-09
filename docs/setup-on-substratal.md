@@ -7,7 +7,7 @@ no concierge steps, and no database access. Request shapes follow the platform d
 
 | Thing | Value |
 |---|---|
-| Managing account | `admin@collectorstunetracker.com` |
+| Managing account | `admin-ctt@thrashingcode.com` |
 | Organization | **Collectors' Tune Tracker** |
 | Production app | slug `ctt` → `app_ctt` |
 | Dev app | slug `ctt-dev` → `app_ctt-dev` (slugs allow `-`, not `_`) |
@@ -28,10 +28,9 @@ no concierge steps, and no database access. Request shapes follow the platform d
 
 ## 0. Before you start
 
-- [ ] **A working mailbox for `admin@collectorstunetracker.com`.** Signing up sends a verification email, and
-      only a verified email can register an application. The domain's DNS is on Vercel today, so set up MX
-      records there for whichever mail host you pick (for example, Proton custom domain). Then carry those same
-      records over when the DNS moves to Route 53 (see [setup-domain-on-aws.md](setup-domain-on-aws.md)).
+- [ ] **A working mailbox for `admin-ctt@thrashingcode.com`.** Signing up sends a verification email, and
+      only a verified email can register an application. This address is on `thrashingcode.com`, so it doesn't
+      depend on the `collectorstunetracker.com` DNS move from Vercel. You can do this guide before or during that move.
 - [ ] A password manager entry for the account, and a place to keep three secrets: the **prod API key**, the
       **dev API key**, and the two **webhook signing secrets**. They'll end up in AWS Secrets Manager.
 - [ ] `curl` and `jq` installed.
@@ -49,7 +48,7 @@ idem() { echo "ctt-setup-$(uuidgen)"; }
 
 ```bash
 curl -sS -X POST $API/auth/signup -H "$V" -H "Content-Type: application/json" -d '{
-  "email": "admin@collectorstunetracker.com",
+  "email": "admin-ctt@thrashingcode.com",
   "password": "<12–128 chars, from your password manager>",
   "display_name": "Collectors'\'' Tune Tracker"
 }' | jq '{user_id, email_verified}'
@@ -67,7 +66,7 @@ organization (step 3), never by sharing this password.
 
 ```bash
 LOGIN=$(curl -sS -X POST $API/auth/login -H "$V" -H "Content-Type: application/json" \
-  -d '{"email":"admin@collectorstunetracker.com","password":"<password>"}')
+  -d '{"email":"admin-ctt@thrashingcode.com","password":"<password>"}')
 echo "$LOGIN" | jq '{mfa_required}'
 # If mfa_required is true:
 TOKEN=$(curl -sS -X POST $API/auth/mfa/verify -H "$V" -H "Content-Type: application/json" \

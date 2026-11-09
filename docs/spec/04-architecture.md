@@ -82,7 +82,7 @@ flowchart LR
 
 | Step | What | Notes |
 |---|---|---|
-| 1 | Create a dedicated **managing account** on Substratal via normal sign-up (e.g. `ctt-admin@<ctt domain>`), verify email, enable MFA/passkey | Not a staff account and not anyone's personal login; credentials in a team password manager. Owns everything below. |
+| 1 | Create a dedicated **managing account** on Substratal via normal sign-up (`admin-ctt@thrashingcode.com`), verify email, enable MFA/passkey | Not a staff account and not anyone's personal login; credentials in a team password manager. Owns everything below. |
 | 2 | Create an **organization** "Collectors' Tune Tracker" owned by that account | Lets more maintainers be added later as org members without sharing the login. |
 | 3 | `POST /applications` → **`app_ctt`** (self-registered, starts `pending_review`) with permissions `app.ctt.collection.{read,write,delete}`, `app.ctt.catalog.{edit,moderate}`, `app.ctt.admin` and roles `role_ctt_collector` (default), `role_ctt_curator`, `role_ctt_admin`; icon from `/brand/logo` | Done by hand from [setup-on-substratal.md](../setup-on-substratal.md), as the managing account. No staff or concierge path. |
 | 4 | Wait for Substratal review → approved | Same queue any customer goes through. |

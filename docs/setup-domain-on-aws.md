@@ -14,7 +14,7 @@ following week.
 | `app.collectorstunetracker.com` | The logged-in app (PWA), its API (`/api/*`), and images (`/media/*`) | CloudFront → S3 (`apps/web`), API Gateway, S3 renditions |
 | `app.dev.collectorstunetracker.com` | Dev environment of the app | Same shape, dev account |
 | `dev.collectorstunetracker.com` | Dev marketing site (optional) | |
-| MX / TXT (SPF, DKIM, DMARC) | Mail for `admin@` and other addresses | Whatever mail host you choose — **must survive both moves** |
+| MX / TXT (SPF, DKIM, DMARC) | Mail on `collectorstunetracker.com`, **if any** (the CTT admin account uses `admin-ctt@thrashingcode.com`, so it isn't affected) | If these records exist, they **must survive both moves** |
 
 TLS: ACM certificates in **us-east-1** (CloudFront requirement), validated by DNS in Route 53.
 
@@ -30,7 +30,7 @@ TLS: ACM certificates in **us-east-1** (CloudFront requirement), validated by DN
    zone in the dev account and add its NS records in the prod zone.
 5. **Switch nameservers**: in Vercel's domain settings, replace Vercel's nameservers with the four Route 53
    nameservers from the hosted zone.
-6. **Verify** with `dig NS collectorstunetracker.com +short` and `dig MX collectorstunetracker.com +short`, and send a test email to `admin@`.
+6. **Verify** with `dig NS collectorstunetracker.com +short` and `dig MX collectorstunetracker.com +short`, and, if the domain has mail, send a test email to an address on it.
 
 To roll back, put Vercel's nameservers back.
 
@@ -41,7 +41,7 @@ To roll back, put Vercel's nameservers back.
 2. **At Vercel:** remove any transfer lock and get the **authorization (EPP) code** from the domain's settings.
    Check Vercel's current docs for the exact "transfer out" steps; their UI changes.
 3. **Make sure the registrant contact email works.** Approval emails go there. Point it at an address you
-   actually read (e.g. `admin@collectorstunetracker.com` once mail is live).
+   actually read, such as `admin-ctt@thrashingcode.com`. It's on a different domain, so it keeps working throughout the transfer.
 4. **At AWS:** go to Route 53 → Registered domains → *Transfer in*, enter the domain and auth code, choose
    **"use existing hosted zone"** (the one from Phase A), and set contacts with privacy protection on.
    The transfer includes a one-year renewal at the Route 53 price for `.com`.
@@ -55,7 +55,7 @@ Because DNS already moved in Phase A, the site and email stay up throughout the 
 
 ## Things to watch
 
-- **Email is the thing most likely to break.** Copy MX/SPF/DKIM/DMARC exactly before switching nameservers.
+- **If the domain has any mail records,** copy MX/SPF/DKIM/DMARC exactly before switching nameservers. Email is the thing most likely to break.
 - If anything on Vercel (an old deployment or preview) still uses the domain, remove it there after cutover so
   Vercel doesn't try to re-claim it.
 - The Substratal app registration (`redirect_uris`, webhook URLs) uses `app.collectorstunetracker.com`. Those must
