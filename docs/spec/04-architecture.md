@@ -3,6 +3,12 @@
 > Status: **Draft v0.1** · 2026-11-09 · Principle: **build CTT the way the Substratal platform builds itself**
 > (Go on arm64 Lambda, Terraform, Aurora PostgreSQL via the Data API, S3 + CloudFront, no VPC/NAT at
 > the starting tier) so the two share tooling, operations, and cost profile.
+>
+> **CTT is a standalone app and a *customer* of Substratal.** It may share some AWS resources (e.g. the
+> Aurora cluster), but it integrates with Substratal **only through the public API**, exactly as an
+> outside company adding its app would: self-registered under a dedicated managing account, hosted OAuth,
+> webhooks, and API keys. No staff shortcuts, no reading Substratal's database, no embedded login.
+> See §3.1.
 
 ## 1. Division of responsibility
 
@@ -72,13 +78,25 @@ flowchart LR
 
 ## 3. Auth & access flow
 
-1. CTT is registered on the platform as **`app_ctt`** with permissions
-   `app.ctt.collection.{read,write,delete}`, `app.ctt.catalog.{edit,moderate}`, `app.ctt.admin` and roles
-   `role_ctt_collector` (default), `role_ctt_curator`, `role_ctt_admin`. (Registration scripted like
-   Substratal's `scripts/register-blog.sh` → `scripts/register-ctt.sh` here.)
-2. Browser → **BFF** `/api/auth/login` → redirect to Substratal hosted login (**authorization code + PKCE**).
-   We use the hosted flow even though a staff-created app could use the embedded flow — it keeps CTT
-   honest as a "third-party" app and gets MFA/passkeys/SSO for free.
+### 3.1 Onboarding CTT as a Substratal customer
+
+| Step | What | Notes |
+|---|---|---|
+| 1 | Create a dedicated **managing account** on Substratal via normal sign-up (e.g. `ctt-admin@<ctt domain>`), verify email, enable MFA/passkey | Not a staff account and not anyone's personal login; credentials in a team password manager. Owns everything below. |
+| 2 | Create an **organization** "Collectors' Tune Tracker" owned by that account | Lets more maintainers be added later as org members without sharing the login. |
+| 3 | `POST /applications` → **`app_ctt`** (self-registered, starts `pending_review`) with permissions `app.ctt.collection.{read,write,delete}`, `app.ctt.catalog.{edit,moderate}`, `app.ctt.admin` and roles `role_ctt_collector` (default), `role_ctt_curator`, `role_ctt_admin`; icon from `/brand/logo` | Scripted in `scripts/register-ctt.sh`, authenticated as the managing account — modeled on Substratal's `register-blog.sh` but **without** any staff/concierge path. |
+| 4 | Wait for Substratal review → approved | Same queue any customer goes through. |
+| 5 | Register OAuth redirect URIs per env, webhook endpoint + subscriptions (`access.revoked`, `role.removed`, erasure), push credentials (later) | Webhook signing secret → Secrets Manager. |
+| 6 | Create a server-to-server **API key** scoped to `app_ctt` | Stored in Secrets Manager; rotated on a schedule. |
+| 7 | Declare the `settings_schema` for CTT user settings (theme, default view, currency, units) | |
+
+Separate `dev` and `prod` registrations (`app_ctt_dev`, `app_ctt`) keep test users and keys apart.
+
+### 3.2 Request flow
+
+1. Browser → **BFF** `/api/auth/login` → redirect to Substratal hosted login (**authorization code + PKCE**).
+   As a self-registered customer app this is the only option (embedded login is staff-only), and it gives
+   MFA/passkeys/SSO for free.
 3. BFF exchanges the code at `/auth/oauth/token`, stores the refresh token **only** in an
    `HttpOnly; Secure; SameSite=Lax` cookie (same pattern as the Substratal Hub's Go BFF), and hands the SPA
    a short-lived **app token** (5-min JWT, `aud=app_ctt`).

@@ -139,6 +139,7 @@ S3 key convention: `u/{owner_sub}/i/{item_id}/{image_id}/original` and `…/{var
   `USING (owner_sub = current_setting('ctt.sub') OR (visibility <> 'private' AND <read-only path>))`.
 - Catalog tables are readable by all; writes only via the moderation path (`catalog_edit`) or the ingest worker role.
 - This mirrors how the Substratal platform itself uses RLS on Aurora via the Data API.
+- Sharing the cluster is an **infrastructure** convenience only: the `ctt` DB roles get no grants on Substratal's schemas, and vice versa. All identity data comes through the Substratal API/JWT.
 
 ## 10. Legacy schema → new model
 

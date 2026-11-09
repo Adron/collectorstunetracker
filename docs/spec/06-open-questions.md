@@ -2,7 +2,7 @@
 
 > Each question has a **working assumption** so work can proceed; answers update the spec.
 >
-> **Decided 2026-11-09:** Q1 → Postgres, `ctt` schema in the shared Substratal Aurora cluster · Q3 → **delete** the DB repo (after history is pushed here) · Q4 → free in v1, quotas only, decide billing later · Q11 → Go.
+> **Decided 2026-11-09:** Q1 → Postgres, `ctt` schema in the shared Substratal Aurora cluster · Q3 → **delete** the DB repo (after history is pushed here) · Q4 → free in v1, quotas only, decide billing later · Q10 → CTT is a standalone Substratal *customer* app with its own managing account · Q11 → Go.
 
 | # | Question | Working assumption |
 |---|---|---|
@@ -15,7 +15,7 @@
 | **Q7** | Should CTT **adopt Substratal Hub themes** (Moss Paper / Forest Floor etc.) or keep its own punk-zine identity and only honor the light/dark bit of the `sub_theme` cookie? | Own identity; honor light/dark only. |
 | **Q8** | Image worker: **Go + libvips** (consistent with the platform, harder packaging) or **Node + sharp** (easier HEIC/AVIF, second language)? | Go + libvips in a Lambda container image; switch if packaging costs > 2 days. |
 | **Q9** | **Domain**: `collectorstunetracker.com`, `ctt.substratalapps.com`, something else? Do you own any of these already? | `ctt.substratalapps.com` for dev/beta. |
-| **Q10** | Is CTT a **first-party (staff-created)** Substratal app? It changes nothing technically under the plan (hosted PKCE either way), but affects registration and review. | First-party, registered via script, still uses hosted PKCE. |
+| **Q10** | Is CTT a first-party (staff-created) Substratal app, or a customer app? | ✅ **Decided:** standalone **customer** app, self-registered under a dedicated managing account + org; public API only. Follow-ups: managing account email/domain? Should that org exist on prod Substratal now? |
 | **Q11** | Backend language: confirm **Go** to match Substratal (vs. TypeScript Lambdas sharing types with the web app). | ✅ **Decided:** Go. |
 | **Q12** | **Shared catalog** vs per-user catalog: are you comfortable with a global, moderated catalog (users' edits visible to everyone), or should early versions keep all catalog data private per user? | Global catalog seeded from MusicBrainz; user-created releases private until submitted. |
 | **Q13** | Priority among the "other collections": memorabilia/tickets, show history (there's a sibling `shows` repo — related?), gear, print? | Order in [05](05-build-plan.md) Phase 3: memorabilia + show history first. |

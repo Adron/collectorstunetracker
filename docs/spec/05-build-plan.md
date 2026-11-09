@@ -26,7 +26,7 @@
 | C2 | `git subtree add --prefix=legacy/database` from `collectorstunetracker_db@main` (history preserved) | ✅ done |
 | C3 | Copy logo assets from `collectors_tracker_docs` into `/brand/logo` | ✅ done |
 | C4 | Write spec docs `/docs/spec/01–06` and new README | ✅ done (this PR) |
-| C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (decided Q3) once this branch is pushed | ⏳ in progress |
+| C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (decided Q3). Branch with its history is pushed. | ⏳ blocked: `gh` token lacks `delete_repo` scope |
 | C6 | Remove the CRA/Next prototype (`src/`, `public/`, `package*.json`) once Phase 0 scaffolding lands | ⏳ Phase 0 |
 | C7 | Decide fate of branches `adding-project-skeleton-defaults`, `release`; keep `collectors_tracker_docs` for GitHub Pages until the new marketing page ships | ⏳ (Q6) |
 | C8 | Delete `legacy/` once the new schema has shipped to prod (history stays in git) | ⏳ Phase 3 |
@@ -38,7 +38,7 @@ Each phase ends deployable to `dev`; phases 2+ also to `prod`.
 ### Phase 0 — Foundations (≈1–2 weeks)
 - Monorepo scaffolding per [04 §9](04-architecture.md#9-repository-layout-target): Go module, `apps/web` (Vite + React 19 + TS), `api/openapi.yaml`, `db/`, `infra/terraform/`.
 - Terraform bootstrap: state, GitHub OIDC role, `dev` env: CloudFront + S3 web, HTTP API + `api`/`bff` Lambdas, `ctt` schema in Aurora via Data API.
-- `scripts/register-ctt.sh`: register `app_ctt` with permissions/roles on Substratal.
+- Substratal customer onboarding ([04 §3.1](04-architecture.md#31-onboarding-ctt-as-a-substratal-customer)): create the dedicated CTT managing account + org, then `scripts/register-ctt.sh` self-registers `app_ctt_dev`/`app_ctt` and goes through Substratal review like any customer.
 - BFF login/logout/refresh with hosted PKCE; JWT verification middleware; RLS `SET LOCAL` plumbing.
 - Design tokens (`tokens.css`), fonts, app shell, sleeve-badge favicon/PWA icons, `<RansomTitle>`, empty states, 404.
 - CI: Go test/lint, web typecheck/test, `terraform plan` on PR.
