@@ -1,90 +1,38 @@
-![Github Ident](https://github.com/Adron/collectorstunetracker/raw/collectors_tracker_docs/graphics/logo/github-banner/5.png)
+![Collectors' Tune Tracker](brand/logo/github-banner/5.png)
 
 # Collectors' Tune Tracker (CTT)
 
-* [Github *Pages* Site](https://adron.github.io/collectorstunetracker/)
-* [Github Pages Site Repository](https://github.com/Adron/collectorstunetracker/tree/collectors_tracker_docs)
-* [Github Repository](https://github.com/Adron/collectorstunetracker)
-* [Collectors' Tune Tracker Database](https://github.com/Adron/collectorstunetracker_db)
+**The crate-digger's logbook.** Catalog every record, CD, tape, poster, and ticket stub you own — photograph it,
+grade it, value it — then follow the people, labels, and pressings that connect one piece of music to the next.
 
-> More details to come...  April 7th, 2024.
+> 🚧 **Re-platforming in progress (Nov 2026).** This repo is being rebuilt from the spec in [`docs/spec`](docs/spec).
+> The old Create-React-App prototype in `src/` is slated for removal, and the former
+> `collectorstunetracker_db` repo now lives in [`legacy/database`](legacy/database) for reference.
 
-The idea behind the CTT is to serve several key larger picture ideas behind enjoying, collecting, and learning about music, artists, performers, writers, and related persuits.
+## Specification
 
-1. Provide a simple interface to look up music, musicians, artists, performers, writers, and related people involved in the community/industry.
-2. Provide a way to provide updates and additions manually.
-3. Provide a way to map additional correlations between music, musicians, artists, performers, and writers. Based around the idea of being able to research multiple depths of information about a particular music, musician, artist, performer, or writer along with history, events, and related information about said music.
-4. Provide a way to retrieve information in an automated way from other systems (like CDDB for example, more thoughts on this [here](https://github.com/Adron/collectorstunetracker/issues/4)).
+| Doc | What's in it |
+|---|---|
+| [01 — Product Spec](docs/spec/01-product-spec.md) | Vision, personas, formats & collection kinds, features, images, NFRs |
+| [02 — Brand & Design](docs/spec/02-brand-and-design.md) | Marks, palette, type, components, motion, voice, accessibility |
+| [03 — Domain & Data Model](docs/spec/03-domain-and-data-model.md) | Catalog vs. copy, entities, RLS tenancy, legacy mapping |
+| [04 — Architecture](docs/spec/04-architecture.md) | AWS + Substratal Apps platform, auth, DB, image pipeline, repo layout |
+| [05 — Build Plan](docs/spec/05-build-plan.md) | Audit of what exists, consolidation steps, phased roadmap |
+| [06 — Open Questions](docs/spec/06-open-questions.md) | Decisions pending, with working assumptions |
 
+## Stack (target)
 
+React 19 + Vite PWA · Go on AWS Lambda (arm64) · API Gateway HTTP API · Aurora Serverless v2 PostgreSQL (Data API, RLS) ·
+S3 + CloudFront media pipeline · Terraform · identity, orgs & roles via the **Substratal Apps** platform.
 
-# Getting Started with Create React App
+## Brand
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Logo system lives in [`brand/logo`](brand/logo) — zine wordmark, sleeve badge, and CTT block in
+charcoal `#1C191A`, cream `#F6E7D8`, teal `#07A5C3`, signal `#F14902`, and mustard `#F4B324`.
 
-## Available Scripts
+## Links
 
-In the project directory, you can run:
+* [GitHub Pages site](https://adron.github.io/collectorstunetracker/) (from the `collectors_tracker_docs` branch)
+* [Automated lookups / CDDB discussion — issue #4](https://github.com/Adron/collectorstunetracker/issues/4)
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+*Est. 2024.*
