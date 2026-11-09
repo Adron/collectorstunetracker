@@ -1,6 +1,6 @@
 # 03 — Domain & Data Model
 
-> Status: **Draft v0.1** · 2026-11-09 · Engine: **PostgreSQL (Aurora Serverless v2)**, `ctt` schema in the shared
+> Status: **Draft v0.1** · 2026-11-09 · Engine: **PostgreSQL (Aurora Serverless v2)**, own `ctt` **database** in the shared
 > Substratal cluster (decided — Q1 in [06](06-open-questions.md)); see [04 — Architecture](04-architecture.md) §4.
 
 ## 1. Core idea: catalog vs. copy
@@ -133,13 +133,15 @@ S3 key convention: `u/{owner_sub}/i/{item_id}/{image_id}/original` and `…/{var
 - Money: `numeric(12,2)` + ISO-4217 currency code.
 
 ## 9. Tenancy & security (Row-Level Security)
-- Schema `ctt` in Postgres. Two roles: `ctt_api` (app) and `ctt_admin` (migrations).
+- Everything lives in a dedicated Postgres **database `ctt`**, split into schemas by bounded context:
+  `catalog`, `collection`, `media`, `ingest`, `app`. Roles: `ctt_owner`, `ctt_migrator`, `ctt_api`, `ctt_worker`,
+  `ctt_readonly`. How this stays fully separate from Substratal is in [04 §4.2](04-architecture.md#42-how-ctt-stays-autonomous-a-separate-database-not-just-a-schema).
 - Each request runs in a transaction that sets `SET LOCAL ctt.sub = '<jwt sub>'` and `ctt.org = '<org_id>'`.
 - RLS policies on all collection/media/ingest tables:
   `USING (owner_sub = current_setting('ctt.sub') OR (visibility <> 'private' AND <read-only path>))`.
 - Catalog tables are readable by all; writes only via the moderation path (`catalog_edit`) or the ingest worker role.
 - This mirrors how the Substratal platform itself uses RLS on Aurora via the Data API.
-- Sharing the cluster is an **infrastructure** convenience only: the `ctt` DB roles get no grants on Substratal's schemas, and vice versa. All identity data comes through the Substratal API/JWT.
+- Sharing the cluster is an **infrastructure** convenience only. CTT roles can't even connect to the `substratal` database, and vice versa. All identity data comes through the Substratal API/JWT.
 
 ## 10. Legacy schema → new model
 
@@ -149,7 +151,7 @@ S3 key convention: `u/{owner_sub}/i/{item_id}/{image_id}/original` and `…/{var
 | `the_system.users` (plaintext seed password `changeThis!`) | **Dropped** — identity moves to Substratal; no passwords ever stored in CTT |
 | `the_system.roles` (`can_add/can_edit/can_delete`) | **Replaced** by Substratal app roles + permissions: `app.ctt.collection.read`, `app.ctt.collection.write`, `app.ctt.collection.delete`, `app.ctt.catalog.edit`, `app.ctt.catalog.moderate`, `app.ctt.admin` |
 | `the_system.user_roles` | **Replaced** by Substratal `/users/{id}/roles` |
-| `the_collections` schema (empty) | **Becomes** the `ctt` schema with everything above |
+| `the_collections` schema (empty) | **Becomes** the `ctt` database with the schemas above |
 | `notes` / `message` columns on every table | Dropped as a convention; per-entity `notes_md` where it's meaningful |
 
 The legacy schema holds only a seed root account (no collection data), so this is assumed to be a design

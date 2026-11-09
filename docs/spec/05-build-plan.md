@@ -28,7 +28,11 @@
 | C4 | Write spec docs `/docs/spec/01–06` and new README | ✅ done (this PR) |
 | C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (decided Q3). Branch with its history is pushed. | ⏳ blocked: `gh` token lacks `delete_repo` scope |
 | C6 | Remove the CRA/Next prototype (`src/`, `public/`, `package*.json`) once Phase 0 scaffolding lands | ⏳ Phase 0 |
-| C7 | Decide fate of branches `adding-project-skeleton-defaults`, `release`; keep `collectors_tracker_docs` for GitHub Pages until the new marketing page ships | ⏳ (Q6) |
+| C7 | Delete branches `adding-project-skeleton-defaults` and `release` | ⏳ you: `git push origin --delete adding-project-skeleton-defaults release` |
+| C7b | Delete `collectors_tracker_docs` once the new marketing site is live on `collectorstunetracker.com` | ⏳ Phase 1 |
+| C9 | `LICENSE` → proprietary | ✅ done |
+| C10 | DNS to Route 53, then registrar transfer from Vercel ([setup-domain-on-aws.md](../setup-domain-on-aws.md)) | ⏳ you, Phase 0 |
+| C11 | Substratal onboarding ([setup-on-substratal.md](../setup-on-substratal.md)) | ⏳ you, Phase 0 |
 | C8 | Delete `legacy/` once the new schema has shipped to prod (history stays in git) | ⏳ Phase 3 |
 
 ## 3. Phased build
@@ -37,12 +41,14 @@ Each phase ends deployable to `dev`; phases 2+ also to `prod`.
 
 ### Phase 0 — Foundations (≈1–2 weeks)
 - Monorepo scaffolding per [04 §9](04-architecture.md#9-repository-layout-target): Go module, `apps/web` (Vite + React 19 + TS), `api/openapi.yaml`, `db/`, `infra/terraform/`.
-- Terraform bootstrap: state, GitHub OIDC role, `dev` env: CloudFront + S3 web, HTTP API + `api`/`bff` Lambdas, `ctt` schema in Aurora via Data API.
-- Substratal customer onboarding ([04 §3.1](04-architecture.md#31-onboarding-ctt-as-a-substratal-customer)): create the dedicated CTT managing account + org, then `scripts/register-ctt.sh` self-registers `app_ctt_dev`/`app_ctt` and goes through Substratal review like any customer.
+- Terraform bootstrap: state, GitHub OIDC role, `dev` env: CloudFront + S3 web, HTTP API + `api`/`bff` Lambdas, `ctt` database + roles in the shared Aurora cluster (bootstrap SQL, Data API), CI against stock `postgres:17`.
+- Route 53 hosted zone for `collectorstunetracker.com` (records imported from Vercel), ACM certs, CloudFront for apex/`www` (site) and `app.` (app).
+- Substratal customer onboarding, done by hand following [setup-on-substratal.md](../setup-on-substratal.md): the `admin@collectorstunetracker.com` account, the **Collectors' Tune Tracker** org, and `app_ctt` / `app_ctt-dev` through Substratal review like any customer.
 - BFF login/logout/refresh with hosted PKCE; JWT verification middleware; RLS `SET LOCAL` plumbing.
 - Design tokens (`tokens.css`), fonts, app shell, sleeve-badge favicon/PWA icons, `<RansomTitle>`, empty states, 404.
 - CI: Go test/lint, web typecheck/test, `terraform plan` on PR.
-- **Exit:** sign in with Substratal → see an empty, on-brand shelf on `dev`.
+- `apps/site`: first cut of the marketing page at `collectorstunetracker.com` (zine hero, what CTT is, **Log in** → `app.`).
+- **Exit:** sign in with Substratal → see an empty, on-brand shelf on `app.dev`. *(Depends on Q16: the hosted sign-in page must be live. Until it is, the exit is "PKCE flow passes against a contract-level mock".)*
 
 ### Phase 1 — Collect (MVP core) (≈3–4 weeks)
 - Migrations: `format` (seeded), `collection`, `item`, `item_condition`, `location`, `tag`, `item_image`.

@@ -144,7 +144,15 @@ same label year).
 - **Crates**: user-made lists across collections ("Sunday morning", "Records to digitize", "Sell pile").
 - **Listening log**: tap "spinning now" → play count, last played, optional gear used.
 
-### 5.8 Sharing (v1 minimal)
+### 5.8 Two front doors
+- **`collectorstunetracker.com`**, the product site: what CTT is and who it's for, with screenshots of the shelf,
+  the capture flow and the rabbit hole, plus supported formats, FAQ, privacy, and support. It's loud zine design with a
+  prominent **Log in** / **Start your shelf** button that goes to the app. Static and fast; no account needed.
+- **`app.collectorstunetracker.com`**, the app itself. A visitor who isn't signed in is sent straight to Substratal's
+  hosted sign-in, then lands back on their shelf.
+- Public shelves (§5.9) live under the app domain (`app.collectorstunetracker.com/s/{slug}`), viewable without signing in.
+
+### 5.9 Sharing (v1 minimal)
 - Per-collection visibility: private (default), unlisted link, public.
 - Public shelf page uses the zine aesthetic and is read-only.
 

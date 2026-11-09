@@ -18,7 +18,9 @@ grade it, value it — then follow the people, labels, and pressings that connec
 | [03 — Domain & Data Model](docs/spec/03-domain-and-data-model.md) | Catalog vs. copy, entities, RLS tenancy, legacy mapping |
 | [04 — Architecture](docs/spec/04-architecture.md) | AWS + Substratal Apps platform, auth, DB, image pipeline, repo layout |
 | [05 — Build Plan](docs/spec/05-build-plan.md) | Audit of what exists, consolidation steps, phased roadmap |
-| [06 — Open Questions](docs/spec/06-open-questions.md) | Decisions pending, with working assumptions |
+| [06 — Open Questions](docs/spec/06-open-questions.md) | Decisions made and still pending |
+
+**Setup runbooks (done by hand):** [Set up CTT on Substratal](docs/setup-on-substratal.md) · [Move the domain to AWS](docs/setup-domain-on-aws.md)
 
 ## Stack (target)
 
@@ -32,7 +34,8 @@ charcoal `#1C191A`, cream `#F6E7D8`, teal `#07A5C3`, signal `#F14902`, and musta
 
 ## Links
 
-* [GitHub Pages site](https://adron.github.io/collectorstunetracker/) (from the `collectors_tracker_docs` branch)
+* Product site: https://collectorstunetracker.com · App: https://app.collectorstunetracker.com (coming soon)
+* Legacy [GitHub Pages site](https://adron.github.io/collectorstunetracker/) (`collectors_tracker_docs` branch, retiring)
 * [Automated lookups / CDDB discussion — issue #4](https://github.com/Adron/collectorstunetracker/issues/4)
 
-*Est. 2024.*
+*Est. 2024.* · Proprietary. All rights reserved. See [LICENSE](LICENSE).

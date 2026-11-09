@@ -1,23 +1,29 @@
-# 06 — Open Questions
+# 06 — Open Questions & Decisions
 
-> Each question has a **working assumption** so work can proceed; answers update the spec.
->
-> **Decided 2026-11-09:** Q1 → Postgres, `ctt` schema in the shared Substratal Aurora cluster · Q3 → **delete** the DB repo (after history is pushed here) · Q4 → free in v1, quotas only, decide billing later · Q10 → CTT is a standalone Substratal *customer* app with its own managing account · Q11 → Go.
+## Decided
+
+| # | Question | Decision (2026-11-09) |
+|---|---|---|
+| Q1 | Database engine & placement | Postgres (Aurora Serverless v2). CTT gets its **own `ctt` database** in the shared Substratal cluster, fully isolated and built to be moved out ([04 §4](04-architecture.md#4-database)). |
+| Q2 | Real data in the legacy schema to migrate? | None assumed: design migration only. |
+| Q3 | Fate of `Adron/collectorstunetracker_db` | **Delete.** History is preserved in `/legacy/database` on the pushed branch. Waiting only on a `gh` token with the `delete_repo` scope. |
+| Q4 | Billing | Free in v1, with storage quotas; billing decided later. |
+| Q5 | License | **Proprietary**, all rights reserved (`LICENSE`). |
+| Q6 | Old branches | Delete `adding-project-skeleton-defaults` and `release` (pending, run by you). `collectors_tracker_docs` stays until the new marketing site ships, then gets deleted (its logos already live in `/brand/logo`). |
+| Q7 | Theme | Punk-zine **everywhere**. Honor only the light/dark bit of Substratal's `sub_theme`; both modes are fully zine ([02 §3.6](02-brand-and-design.md#36-both-modes-are-zine)). |
+| Q9 | Domain | `collectorstunetracker.com` = marketing/product site with **Log in**; `app.collectorstunetracker.com` = the app. Domain moves from Vercel to Route 53 ([setup-domain-on-aws.md](../setup-domain-on-aws.md)). |
+| Q10 | Relationship to Substratal | Standalone **customer** app, self-registered by `admin@collectorstunetracker.com` under the **Collectors' Tune Tracker** org; public API only ([setup-on-substratal.md](../setup-on-substratal.md)). |
+| Q11 | Backend language | Go. |
+| Q13 | Sibling `shows` repo | Unrelated. Ignored. |
+
+## Still open
 
 | # | Question | Working assumption |
 |---|---|---|
-| **Q1** | **Database engine** — you said "determine later." OK to proceed with Postgres (Aurora Serverless v2) as the working target? Shared Substratal cluster with a `ctt` schema, or a dedicated cluster from day one? | ✅ **Decided:** Postgres (Aurora Serverless v2), `ctt` schema in the shared Substratal cluster. |
-| **Q2** | Is there **any real data** in a deployed instance of the legacy `the_system` schema (or the Vercel Postgres the prototype pointed at) that must be migrated? | No — design migration only. |
-| **Q3** | Archive or delete the GitHub repo **`Adron/collectorstunetracker_db`**? Its history is now preserved in `/legacy/database`. | ✅ **Decided:** delete, after the consolidation branch is pushed. |
-| **Q4** | Will CTT **charge** (e.g. storage tiers for images, pro features)? The Substratal platform's billing only covers its own plans, so CTT billing would be CTT's own Stripe integration. | ✅ **Decided:** free in v1 with storage quotas; billing decided later. |
-| **Q5** | `LICENSE` is an **empty file**. Open source (MIT/Apache-2.0/AGPL) or proprietary? | Leave as-is until you decide; flagged. |
-| **Q6** | Fate of branches `adding-project-skeleton-defaults` (Spring Boot), `release` (empty), and `collectors_tracker_docs` (GitHub Pages)? | Delete the first two after merge; keep `collectors_tracker_docs` until a new landing page ships. |
-| **Q7** | Should CTT **adopt Substratal Hub themes** (Moss Paper / Forest Floor etc.) or keep its own punk-zine identity and only honor the light/dark bit of the `sub_theme` cookie? | Own identity; honor light/dark only. |
-| **Q8** | Image worker: **Go + libvips** (consistent with the platform, harder packaging) or **Node + sharp** (easier HEIC/AVIF, second language)? | Go + libvips in a Lambda container image; switch if packaging costs > 2 days. |
-| **Q9** | **Domain**: `collectorstunetracker.com`, `ctt.substratalapps.com`, something else? Do you own any of these already? | `ctt.substratalapps.com` for dev/beta. |
-| **Q10** | Is CTT a first-party (staff-created) Substratal app, or a customer app? | ✅ **Decided:** standalone **customer** app, self-registered under a dedicated managing account + org; public API only. Follow-ups: managing account email/domain? Should that org exist on prod Substratal now? |
-| **Q11** | Backend language: confirm **Go** to match Substratal (vs. TypeScript Lambdas sharing types with the web app). | ✅ **Decided:** Go. |
-| **Q12** | **Shared catalog** vs per-user catalog: are you comfortable with a global, moderated catalog (users' edits visible to everyone), or should early versions keep all catalog data private per user? | Global catalog seeded from MusicBrainz; user-created releases private until submitted. |
-| **Q13** | Priority among the "other collections": memorabilia/tickets, show history (there's a sibling `shows` repo — related?), gear, print? | Order in [05](05-build-plan.md) Phase 3: memorabilia + show history first. |
-| **Q14** | Native mobile in scope for this year, or PWA only? | PWA only until Phase 4. |
-| **Q15** | Which **AWS account(s)/region** — the same account as Substratal prod or a separate one per env? | Separate accounts for dev/prod under the same org; region = Substratal's. |
+| **Q8** | Image worker: **Go + libvips** (consistent, harder packaging) or **Node + sharp** (easier HEIC/AVIF, second language)? | Go + libvips in a Lambda container image; switch if packaging costs more than 2 days. |
+| **Q12** | Shared, moderated catalog vs per-user catalog? | Global catalog seeded from MusicBrainz; user-created releases private until submitted. |
+| **Q14** | Native mobile this year, or PWA only? | PWA only until Phase 4. |
+| **Q15** | AWS accounts. The Aurora cluster lives in Substratal's account. Should CTT run in that **same account**, or in its own accounts that assume a narrow cross-account role for the Data API? | Own CTT accounts (dev/prod) in the same AWS Organization, plus a cross-account role in the Substratal account that allows `rds-data` on the cluster and reads only `ctt/*` secrets. |
+| **Q16** | **Hosted sign-in page.** `auth.substratalapps.com/authorize` isn't live, and self-registered apps can't use embedded login. When will the Substratal dashboard and hosted page ship? | CTT Phase 0 builds the full PKCE flow against the published contract. End-to-end login waits on the page. **No embedded-login workaround.** |
+| **Q17** | Mail host for `admin@collectorstunetracker.com` (needed before Substratal signup)? | Proton custom domain (you already use Proton), with MX/SPF/DKIM/DMARC records carried through the DNS move. |
+| **Q18** | Copyright holder name in `LICENSE`: you personally, or a company (e.g. Composite Code)? | "Adron Hall" for now. |

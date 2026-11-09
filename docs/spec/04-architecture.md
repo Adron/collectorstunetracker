@@ -35,11 +35,11 @@ flowchart LR
   subgraph Substratal["Substratal Apps platform"]
     SAUTH["/auth/oauth/* · JWKS"]
     SAPI["Users · Orgs · Roles · Settings · Notifications"]
-    SWH["Webhooks: access.revoked, role.removed, user.erased"]
+    SWH["Webhooks: access.revoked, role.removed, user.deleted"]
   end
 
   subgraph AWS["AWS — CTT account / env"]
-    CF["CloudFront (ctt domain)"]
+    CF["CloudFront (app.collectorstunetracker.com)"]
     S3W["S3: web assets"]
     HTTP["API Gateway HTTP API"]
     BFF["λ bff (Go) — session cookie, token refresh"]
@@ -52,7 +52,7 @@ flowchart LR
     SYNC["λ catalog-sync (Go) — EventBridge Scheduler"]
     S3O["S3: originals (private)"]
     S3R["S3: renditions"]
-    DB[("Aurora Serverless v2 PostgreSQL\nschema ctt · RLS · Data API")]
+    DB[("Aurora Serverless v2 PostgreSQL\ndatabase ctt · RLS · Data API")]
     SM["Secrets Manager / KMS"]
   end
 
@@ -84,13 +84,13 @@ flowchart LR
 |---|---|---|
 | 1 | Create a dedicated **managing account** on Substratal via normal sign-up (e.g. `ctt-admin@<ctt domain>`), verify email, enable MFA/passkey | Not a staff account and not anyone's personal login; credentials in a team password manager. Owns everything below. |
 | 2 | Create an **organization** "Collectors' Tune Tracker" owned by that account | Lets more maintainers be added later as org members without sharing the login. |
-| 3 | `POST /applications` → **`app_ctt`** (self-registered, starts `pending_review`) with permissions `app.ctt.collection.{read,write,delete}`, `app.ctt.catalog.{edit,moderate}`, `app.ctt.admin` and roles `role_ctt_collector` (default), `role_ctt_curator`, `role_ctt_admin`; icon from `/brand/logo` | Scripted in `scripts/register-ctt.sh`, authenticated as the managing account — modeled on Substratal's `register-blog.sh` but **without** any staff/concierge path. |
+| 3 | `POST /applications` → **`app_ctt`** (self-registered, starts `pending_review`) with permissions `app.ctt.collection.{read,write,delete}`, `app.ctt.catalog.{edit,moderate}`, `app.ctt.admin` and roles `role_ctt_collector` (default), `role_ctt_curator`, `role_ctt_admin`; icon from `/brand/logo` | Done by hand from [setup-on-substratal.md](../setup-on-substratal.md), as the managing account. No staff or concierge path. |
 | 4 | Wait for Substratal review → approved | Same queue any customer goes through. |
 | 5 | Register OAuth redirect URIs per env, webhook endpoint + subscriptions (`access.revoked`, `role.removed`, erasure), push credentials (later) | Webhook signing secret → Secrets Manager. |
 | 6 | Create a server-to-server **API key** scoped to `app_ctt` | Stored in Secrets Manager; rotated on a schedule. |
 | 7 | Declare the `settings_schema` for CTT user settings (theme, default view, currency, units) | |
 
-Separate `dev` and `prod` registrations (`app_ctt_dev`, `app_ctt`) keep test users and keys apart.
+Separate `dev` and `prod` registrations (`app_ctt-dev`, `app_ctt`; slugs can't contain `_`) keep test users and keys apart.
 
 ### 3.2 Request flow
 
@@ -104,32 +104,83 @@ Separate `dev` and `prod` registrations (`app_ctt_dev`, `app_ctt`) keep test use
    `entitlement_status`, `effective_permissions`, then opens a DB transaction with
    `SET LOCAL ctt.sub/ctt.org` so Postgres RLS enforces ownership (defense in depth).
 5. **Revocation (required by the platform):** the `webhooks` Lambda subscribes to `access.revoked` and
-   `role.removed`, verifies the signature, and kills matching BFF sessions immediately. Erasure webhooks
+   `role.removed`, verifies the signature, and kills matching BFF sessions immediately. `user.deleted` webhooks
    trigger a purge job for that `sub` (rows + S3 prefix `u/{sub}/`).
 6. Server-to-server calls (e.g. sending notifications) use a Substratal **API key** scoped to `app_ctt`
    from Secrets Manager, with `Idempotency-Key` on POSTs.
 
 ## 4. Database
 
-**Decision (Q1): Aurora Serverless v2 PostgreSQL, own `ctt` schema in the shared Substratal cluster, accessed via the RDS Data API, RLS on.**
+**Decision (Q1, refined): Aurora Serverless v2 PostgreSQL. CTT gets its own `ctt` database inside the shared
+Substratal cluster, reached through the RDS Data API, with RLS on.**
 
-Why Postgres fits this domain:
-- The domain is **relational and graph-ish** — works → releases → media → tracks, many-to-many credits,
+### 4.1 Why Postgres
+- The domain is **relational and graph-ish**: works → releases → media → tracks, many-to-many credits,
   relationships, events. "Every release this engineer cut, that I own, on a 1970s pressing" is a join, not a key lookup.
-- Fuzzy search (`pg_trgm`) + full text (`tsvector`) cover v1 search without another service.
-- `jsonb` gives schemaless format attributes (RPM, NR type, color variants) without per-format tables.
-- Continuity: the legacy CTT schemas were Postgres; the Substratal platform is Postgres with RLS + Data API.
-- Data API = no VPC, no NAT, no connection pooling headaches from Lambda.
+- `pg_trgm` fuzzy matching plus `tsvector` full text cover v1 search without adding another service.
+- `jsonb` holds schemaless format attributes (RPM, noise reduction, color variants) without a table per format.
+- The Data API means no VPC, no NAT, and no connection pooling to manage from Lambda, which matches the platform.
+
+### 4.2 How CTT stays autonomous: a separate *database*, not just a schema
+
+A schema alone isn't enough. A Postgres **cluster** can hold many **databases**, and a database is the unit
+that is truly walled off: a session connected to one database **cannot query another**, even if the SQL names
+it, because Postgres has no cross-database joins (short of extensions like `dblink`/`postgres_fdw`, which CTT
+never installs). So CTT is split at every level:
+
+```
+Aurora cluster (shared infrastructure: compute/ACUs, storage, backups, patching)
+├── database "substratal"   ← Substratal platform (incl. its "blog" schema). CTT has no access.
+└── database "ctt"          ← everything CTT owns, nothing else
+    ├── schema catalog      parties, works, releases, media, tracks, credits, labels, identifiers, events…
+    ├── schema collection   collections, items, conditions, locations, loans, plays, crates, wants, tags
+    ├── schema media        item_image, image_rendition
+    ├── schema ingest       import_job, import_row, external_ref, lookup_cache
+    └── schema app          bff sessions, webhook dedupe log, schema_migrations
+```
+
+| Layer | Isolation | Enforced by |
+|---|---|---|
+| **Database** | `CREATE DATABASE ctt OWNER ctt_owner`; `REVOKE CONNECT ON DATABASE ctt FROM PUBLIC`; likewise `REVOKE CONNECT ON DATABASE substratal FROM` every `ctt_*` role | Postgres connection authorization |
+| **Roles** | All CTT roles use the `ctt_` prefix: `ctt_owner` (NOLOGIN, owns all objects), `ctt_migrator` (DDL), `ctt_api` (DML under RLS), `ctt_worker` (ingest/image jobs), `ctt_readonly` (support/analytics). None are members of any Substratal role, and none have superuser, `rds_superuser`, or `CREATEROLE`. | Postgres grants |
+| **Credentials** | One Secrets Manager secret per CTT role (`ctt/{env}/db/ctt_api`, …). The Data API uses the secret to decide *which DB user* runs a statement, and every call passes `database: "ctt"`. | Secrets Manager + IAM |
+| **IAM** | CTT Lambdas may call `rds-data:*` on the cluster ARN **and** read only `ctt/*` secrets. Without a Substratal secret, they can't act as a Substratal DB user. | IAM policy (plus a cross-account role if the cluster lives in the Substratal account; see Q15) |
+| **Extensions** | `pg_trgm` and `btree_gin` are installed **in the `ctt` database only** (extensions are per-database). No `dblink`, no `postgres_fdw`. UUIDv7 ids are generated in Go, not by an extension, so any Postgres 15+ works. | Migration review |
+| **Code** | Connection config is three env vars: `CTT_DB_CLUSTER_ARN`, `CTT_DB_SECRET_ARN`, `CTT_DB_NAME`. The Go `internal/db` package hides the Data API behind an interface, with a `pgx` implementation for plain Postgres (local dev, CI, and any future host). | Code structure |
+| **Terraform** | CTT's Terraform **reads** the cluster as a data source (ARN via tfvars) and creates only CTT's secrets, IAM, and DB bootstrap. It never changes cluster settings, and Substratal's Terraform never references CTT. Separate state files. | Separate stacks |
+| **Data flow** | No foreign keys, views, triggers, or jobs cross into `substratal`. User identity arrives only as JWT claims (`sub`, `org_id`) and is stored as plain text ids. | Design rule, checked in code review |
+
+**The only shared touchpoint** is a one-time bootstrap: someone with the cluster's admin credentials runs
+`db/bootstrap/0000_ctt_database_and_roles.sql` (create the database and the `ctt_*` roles, set
+role passwords from the CTT secrets, apply the revokes above). From then on, CTT's own migrator owns everything inside `ctt`.
+
+### 4.3 Moving CTT to its own Postgres later
+
+Because nothing crosses the database boundary, a move is mechanical:
+
+1. Provision the new Postgres: a dedicated Aurora cluster, RDS, Aurora DSQL if it's compatible by then, or any other host.
+2. Run `db/bootstrap` there to create the same roles.
+3. Copy the data:
+   - **Small/maintenance window:** `pg_dump -Fc -d ctt` → `pg_restore` (roles already exist, ownership carries over).
+   - **Near-zero downtime:** logical replication (publication on `ctt`, subscription on the new host), then a short cutover.
+4. Point the three env vars at the new host (or switch the `internal/db` driver to `pgx` if it's not Data-API-capable) and redeploy.
+5. `DROP DATABASE ctt` on the shared cluster.
+
+**Proof it stays portable:** CI runs every migration and the full integration suite against a **stock
+`postgres:17` container**, not Aurora. Anything Aurora-specific that slips into CTT fails the build.
+
+### 4.4 Alternatives considered
 
 | Option | Verdict |
 |---|---|
-| **A. `ctt` schema in the existing Substratal Aurora cluster** (like the blog engine's `blog` schema) | ✅ **Start here.** Lowest cost/ops; separate DB roles + RLS keep isolation. |
-| B. Dedicated Aurora Serverless v2 cluster for CTT | Move here when CTT load or blast-radius concerns justify it. Migration is a dump/restore — same engine. |
-| C. Aurora DSQL | Interesting (serverless, scale-to-zero, Postgres-compatible) but feature gaps (e.g. extensions like `pg_trgm`, foreign keys, RLS) need verification before betting on it. |
-| D. DynamoDB | ✘ Poor fit for the credit/relationship graph and ad-hoc collector queries; would force a second search store early. |
+| **A. Own `ctt` database in the shared Substratal cluster** | ✅ **Chosen.** Lowest cost and ops; hard isolation at the database level; the move-out path is above. |
+| A′. Only a `ctt` schema inside the `substratal` database (the blog engine's pattern) | ✘ Too coupled: shared search_path, extensions, and `pg_dump` scope, and it invites cross-schema joins. |
+| B. Dedicated Aurora Serverless v2 cluster | The move-out target when CTT load, blast radius, or ownership justify it. |
+| C. Aurora DSQL | Watch: serverless and Postgres-compatible, but `pg_trgm`, foreign keys, and RLS support need verifying first. |
+| D. DynamoDB | ✘ Poor fit for the credit/relationship graph and ad-hoc collector queries. |
 
-Migrations: plain numbered SQL in `/db/migrations` (same style as the platform), applied by a migration
-Lambda/CLI in CI. Reference data (formats, grade scale, credit roles) in `/db/seed`.
+Migrations: plain numbered SQL in `/db/migrations`, run as `ctt_migrator` by the `migrate` Lambda in CI. Reference
+data (formats, grade scale, credit roles) lives in `/db/seed`.
 
 ## 5. Images pipeline
 
@@ -194,14 +245,28 @@ Same stack as the Substratal Hub, styled with CTT's own brand tokens ([02](02-br
 - **vite-plugin-pwa / Workbox**: installable, offline shelf, background-sync capture queue
 - Barcode scanning: `BarcodeDetector` API with a ZXing WASM fallback
 - Tests: Vitest + Testing Library, Playwright e2e (incl. visual snapshots of key brand screens)
-- Hosting: S3 + CloudFront (same distribution as `/api/*` and `/media/*` → one origin, no CORS)
+- Hosting: S3 + CloudFront. The app distribution (`app.collectorstunetracker.com`) also routes `/api/*` and `/media/*`, so it's one origin with no CORS. BFF cookies are host-only on `app.`.
+- **Marketing site** (`apps/site`, `collectorstunetracker.com` + `www` redirect): prerendered static HTML/CSS
+  built with Vite from the same `tokens.css` and fonts (no React runtime needed), in its own CloudFront distribution.
+  Its **Log in** button links to `https://app.collectorstunetracker.com/`, and the app starts the PKCE flow.
+
+### 8.1 Domains
+
+| Host | What |
+|---|---|
+| `collectorstunetracker.com`, `www.` | Marketing site |
+| `app.collectorstunetracker.com` | App + `/api` + `/media` (prod) |
+| `app.dev.collectorstunetracker.com` | Dev app (delegated `dev.` subzone in the dev account) |
+
+DNS lives in Route 53 and is managed by Terraform. The registrar moves from Vercel ([setup-domain-on-aws.md](../setup-domain-on-aws.md)).
 
 ## 9. Repository layout (target)
 
 ```
 collectorstunetracker/
 ├── apps/
-│   └── web/                     # React 19 + Vite PWA
+│   ├── web/                     # React 19 + Vite PWA → app.collectorstunetracker.com
+│   └── site/                    # static marketing site → collectorstunetracker.com
 ├── cmd/                         # Go Lambda entrypoints
 │   ├── api/
 │   ├── bff/
@@ -213,13 +278,13 @@ collectorstunetracker/
 ├── internal/                    # Go packages: auth, catalog, collection, media, ingest, db, httpx
 ├── api/openapi.yaml             # CTT API contract
 ├── db/
+│   ├── bootstrap/               # one-time: CREATE DATABASE ctt, ctt_* roles, revokes
 │   ├── migrations/              # 0001_init.sql, 0002_catalog.sql, …
 │   └── seed/                    # formats, grades, credit roles
 ├── infra/terraform/
 │   ├── bootstrap/               # state bucket, OIDC role for GitHub Actions
-│   ├── modules/                 # web, api, media, queues, db-schema, observability
+│   ├── modules/                 # dns, site, web, api, media, queues, db-bootstrap, observability
 │   └── envs/{dev,prod}/
-├── scripts/register-ctt.sh      # registers app_ctt on Substratal
 ├── brand/logo/                  # existing marks (copied from collectors_tracker_docs branch)
 ├── docs/spec/                   # this specification
 ├── legacy/database/             # imported collectorstunetracker_db (history preserved), reference only

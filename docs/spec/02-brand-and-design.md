@@ -112,6 +112,31 @@ The light theme flips to the `png/14` colorway: cream paper with charcoal ink. A
 }
 ```
 
+### 3.6 Both modes are zine
+
+Light mode is **not** a neutral "clean" theme. It's the same zine, just printed differently. Think of dark mode
+as the record shop after hours and light mode as a fresh photocopy on cream stock.
+
+| Element | Back Room (dark) | Cream Sleeve (light) |
+|---|---|---|
+| Paper | Charcoal with ~4% photocopy grain | Cream stock with ~6% toner speckle and faint fold/crease lines on hero areas |
+| Ransom titles | Cream tiles on charcoal | **Inverted:** charcoal tiles with cream letters, plus newsprint-clipping tiles (cream with charcoal text) mixed in |
+| XX face / drips | Spray-painted in the collection accent | Same, using the `-deep` accent so it reads as spray paint on paper |
+| Cards | Smoke surface, taped corners | Slightly off-white "clipping" with a hard 2px charcoal offset shadow (photocopy misregistration), taped corners |
+| Rules & dividers | Cream hairlines at 14% | Hand-cut charcoal rules, slightly uneven (SVG), not perfect 1px lines |
+| Buttons | Teal/signal fills, charcoal labels | Charcoal fills, cream labels; hot = `--ctt-signal-deep` fill. They look like stamped labels. |
+| Stickers / toasts | Cream sticker on charcoal | Mustard/teal sticker with a die-cut white edge |
+| Logo in nav | Sleeve badge, colored vinyl on charcoal sleeve | `png/14` colorway: charcoal vinyl, cream sleeve |
+
+Rules:
+- Every screen in both modes must pass a "would this look at home stapled into a zine?" review. If a screen looks
+  like a generic SaaS dashboard, it isn't done.
+- Mode comes from, in order: the user's CTT setting (`theme`: system/dark/light) → the light/dark bit of Substratal's
+  `sub_theme` cookie → `prefers-color-scheme` → dark. **Hub theme names and palettes are ignored**, by design.
+- The marketing site (`collectorstunetracker.com`) leads with the loud zine wordmark and the animated GIF marks.
+  The app (`app.collectorstunetracker.com`) leads with the sleeve badge and saves the loud zine moments for heroes,
+  empty states, and celebrations.
+
 Condition grades get fixed semantic colors (used as small chips, always with the text label):
 `M/NM` teal · `VG+/VG` mustard · `G+/G` signal · `F/P` muted.
 
