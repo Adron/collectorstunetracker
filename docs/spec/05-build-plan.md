@@ -41,7 +41,7 @@ Each phase ends deployable to `dev`; phases 2+ also to `prod`.
 
 ### Phase 0 — Foundations (≈1–2 weeks)
 - Monorepo scaffolding per [04 §9](04-architecture.md#9-repository-layout-target): Go module, `apps/web` (Vite + React 19 + TS), `api/openapi.yaml`, `db/`, `infra/terraform/`.
-- Terraform bootstrap: state, GitHub OIDC role, `dev` env: CloudFront + S3 web, HTTP API + `api`/`bff` Lambdas, `ctt` database + roles in the shared Aurora cluster (bootstrap SQL, Data API), CI against stock `postgres:17`.
+- Terraform bootstrap: state, GitHub OIDC role, `dev` env: CloudFront + S3 web, HTTP API + `api`/`bff` Lambdas, `ctt` database + roles in the shared Aurora cluster (bootstrap SQL, Data API), CI against stock `postgres:16`.
 - Route 53 hosted zone for `collectorstunetracker.com` (records imported from Vercel), ACM certs, CloudFront for apex/`www` (site) and `app.` (app).
 - Substratal customer onboarding, done by hand following [setup-on-substratal.md](../setup-on-substratal.md): the `admin-ctt@thrashingcode.com` account, the **Collectors' Tune Tracker** org, and `app_ctt` / `app_ctt-dev` through Substratal review like any customer.
 - BFF login/logout/refresh with hosted PKCE; JWT verification middleware; RLS `SET LOCAL` plumbing.

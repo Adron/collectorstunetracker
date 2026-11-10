@@ -145,7 +145,7 @@ Aurora cluster (shared infrastructure: compute/ACUs, storage, backups, patching)
 | **Roles** | All CTT roles use the `ctt_` prefix: `ctt_owner` (NOLOGIN, owns all objects), `ctt_migrator` (DDL), `ctt_api` (DML under RLS), `ctt_worker` (ingest/image jobs), `ctt_readonly` (support/analytics). None are members of any Substratal role, and none have superuser, `rds_superuser`, or `CREATEROLE`. | Postgres grants |
 | **Credentials** | One Secrets Manager secret per CTT role (`ctt/{env}/db/ctt_api`, …). The Data API uses the secret to decide *which DB user* runs a statement, and every call passes `database: "ctt"`. | Secrets Manager + IAM |
 | **IAM** | CTT Lambdas may call `rds-data:*` on the cluster ARN **and** read only `ctt/*` secrets. Without a Substratal secret, they can't act as a Substratal DB user. | IAM policy (plus a cross-account role if the cluster lives in the Substratal account; see Q15) |
-| **Extensions** | `pg_trgm` and `btree_gin` are installed **in the `ctt` database only** (extensions are per-database). No `dblink`, no `postgres_fdw`. UUIDv7 ids are generated in Go, not by an extension, so any Postgres 15+ works. | Migration review |
+| **Extensions** | `pg_trgm` and `btree_gin` are installed **in the `ctt` database only** (extensions are per-database). No `dblink`, no `postgres_fdw`. UUIDv7 ids are generated in Go, not by an extension, so any Postgres 16+ works. | Migration review |
 | **Code** | Connection config is three env vars: `CTT_DB_CLUSTER_ARN`, `CTT_DB_SECRET_ARN`, `CTT_DB_NAME`. The Go `internal/db` package hides the Data API behind an interface, with a `pgx` implementation for plain Postgres (local dev, CI, and any future host). | Code structure |
 | **Terraform** | CTT's Terraform **reads** the cluster as a data source (ARN via tfvars) and creates only CTT's secrets, IAM, and DB bootstrap. It never changes cluster settings, and Substratal's Terraform never references CTT. Separate state files. | Separate stacks |
 | **Data flow** | No foreign keys, views, triggers, or jobs cross into `substratal`. User identity arrives only as JWT claims (`sub`, `org_id`) and is stored as plain text ids. | Design rule, checked in code review |
@@ -167,7 +167,7 @@ Because nothing crosses the database boundary, a move is mechanical:
 5. `DROP DATABASE ctt` on the shared cluster.
 
 **Proof it stays portable:** CI runs every migration and the full integration suite against a **stock
-`postgres:17` container**, not Aurora. Anything Aurora-specific that slips into CTT fails the build.
+`postgres:16` container** (matching the cluster's Aurora PostgreSQL 16.15), not Aurora. Anything Aurora-specific that slips into CTT fails the build.
 
 ### 4.4 Alternatives considered
 
