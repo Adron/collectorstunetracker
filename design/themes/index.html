@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTT Theme Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Courier+Prime:wght@700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@900&family=Rubik+Mono+One&family=Space+Grotesk:wght@400;500;600;700&family=Special+Elite&family=Yellowtail&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="themes.css">
+<style>
+  /* ---------- Lab chrome (not part of the themes) ---------- */
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #1C191A; color: #F6E7D8; font: 15px/1.5 "Space Grotesk", system-ui, sans-serif; }
+  .lab-bar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center;
+    padding: 12px 16px; background: #000; border-bottom: 2px solid #F6E7D8; }
+  .lab-bar h1 { margin: 0; font: 28px/1 "Anton", sans-serif; letter-spacing: .02em; text-transform: uppercase; }
+  .lab-bar h1 small { font: 500 11px "Space Grotesk"; letter-spacing: .3em; margin-left: 10px; color: #A39A92; }
+  .lab-bar .grp { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .lab-bar label { font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #A39A92; }
+  .lab-bar button, .lab-bar select { font: 600 13px "Space Grotesk"; padding: 7px 12px; border-radius: 4px; border: 2px solid #F6E7D8;
+    background: transparent; color: #F6E7D8; cursor: pointer; }
+  .lab-bar button[aria-pressed="true"] { background: #F6E7D8; color: #1C191A; }
+  .lab-bar select option { color: #1C191A; }
+  .lab-bar button:focus-visible, .lab-bar select:focus-visible { outline: 2px solid #07A5C3; outline-offset: 2px; }
+  main { padding: 20px 16px 60px; max-width: 1800px; margin: 0 auto; }
+  .lab-h2 { font: 40px/1 "Anton", sans-serif; text-transform: uppercase; margin: 28px 0 14px; letter-spacing: .02em; }
+  .lab-h2 span { font: 500 12px "Space Grotesk"; letter-spacing: .3em; color: #A39A92; margin-left: 12px; vertical-align: middle; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); gap: 22px; }
+  .lab-note { color: #A39A92; max-width: 900px; margin: 0; }
+  .lab-note code { color: #F6E7D8; }
+  [hidden] { display: none !important; }
+
+  /* ---------- The themed "screen" ---------- */
+  .screen { position: relative; overflow: hidden; isolation: isolate; background: var(--bg); color: var(--text);
+    font-family: var(--font-body); border-radius: 10px; padding: 0 0 18px; border: 1px solid rgb(127 127 127 / .35); }
+  .screen.full { min-height: calc(100vh - 120px); border-radius: 12px; }
+  .grain { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: var(--grain-opacity); mix-blend-mode: var(--grain-blend);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .screen > *:not(.grain) { position: relative; z-index: 1; }
+
+  .eyebrow { font-family: var(--font-eyebrow); font-size: 11px; font-weight: 600; letter-spacing: var(--eyebrow-spacing);
+    text-transform: uppercase; color: var(--muted); margin: 0; }
+
+  /* top bar */
+  .tb { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: var(--rule-width) solid var(--text); }
+  .logo-sleeve { width: 52px; height: 52px; background: var(--logo-sleeve) center 46%/210% no-repeat; flex: none; }
+  .tb nav { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+  .tb nav a { color: var(--muted); text-decoration: none; font-family: var(--font-eyebrow); font-size: 11px; font-weight: 600;
+    letter-spacing: var(--eyebrow-spacing); text-transform: uppercase; padding: 6px 8px; border-radius: var(--radius); }
+  .tb nav a[aria-current] { color: var(--text); box-shadow: inset 0 -3px 0 var(--accent); }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; padding: 18px 16px 6px; }
+  .hero .blurb { margin: 8px 0 0; color: var(--muted); font-size: 13px; max-width: 34ch; }
+  .logo-hero { width: 170px; height: 110px; background: var(--logo-hero) center/150% no-repeat; transform: rotate(var(--tilt)); }
+  .drips { display: block; width: 100%; height: 22px; color: var(--accent); margin-top: -2px; }
+
+  /* ransom title */
+  .ransom { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 3px 2px; line-height: 1; font-size: 30px; }
+  .ransom .t { display: inline-block; padding: 3px 5px 2px; min-width: .55em; text-align: center; box-shadow: 1px 2px 0 rgb(0 0 0 / .35); }
+  .ransom .sp { width: .45em; }
+
+  /* shelf */
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 16px 0; }
+  .script { font-family: var(--font-script); font-size: 26px; color: var(--accent); line-height: 1; }
+  .shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 12px 16px 6px; }
+  @media (max-width: 520px) { .shelf { grid-template-columns: repeat(2, 1fr); } }
+  .card { position: relative; margin: 0; background: var(--surface); border-radius: var(--radius); padding: 6px 6px 8px; box-shadow: var(--card-shadow); }
+  .card::before { content: ""; position: absolute; top: -6px; left: 50%; width: 44px; height: 14px; transform: translateX(-50%) rotate(-4deg);
+    background: var(--tape); z-index: 2; }
+  .card:nth-child(even) { transform: rotate(.6deg); }
+  .card:nth-child(odd) { transform: rotate(-.5deg); }
+  .cover { position: relative; aspect-ratio: 1; border-radius: 2px; overflow: hidden; }
+  .pill { position: absolute; left: 5px; top: 5px; font: 700 9px/1 var(--font-body); letter-spacing: .15em; padding: 4px 5px;
+    background: var(--bg); color: var(--text); border: 1.5px solid var(--text); border-radius: 3px; }
+  .card b { display: block; font-size: 12.5px; line-height: 1.2; margin-top: 7px; }
+  .card .artist { display: block; font-size: 11.5px; color: var(--muted); }
+  .grades { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+  .grade { font: 700 10px/1 var(--font-body); padding: 3px 5px; border-radius: 3px; letter-spacing: .04em; }
+  .g-top { background: var(--accent); color: var(--on-accent); }
+  .g-mid { background: var(--warm); color: var(--on-warm); }
+  .g-low { background: var(--hot); color: var(--on-hot); }
+  .g-poor { background: var(--sunken); color: var(--muted); border: 1px solid var(--border); }
+
+  /* fake album art (fixed: real covers don't change with the theme) */
+  .c1 { background: radial-gradient(circle at 50% 55%, #e9c46a 0 10%, #1d3557 10% 22%, #e76f51 22% 26%, #1d3557 26% 38%, #a8dadc 38% 40%, #1d3557 40%); }
+  .c2 { background: radial-gradient(#3a1d10 30%, transparent 32%) 0 0/12px 12px, linear-gradient(160deg, #c8553d, #6b2d1a); }
+  .c3 { background: linear-gradient(135deg, #4b2e83 0 49%, #b5e48c 49% 51%, #2a9d8f 51%); }
+  .c4 { background: repeating-linear-gradient(90deg, #111 0 10px, #eee 10px 20px); }
+  .c4::after { content: ""; position: absolute; inset: 32% 22%; background: #d62828; }
+
+  /* detail strip */
+  .detail { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 16px 0; padding: 12px; background: var(--sunken);
+    border: var(--rule-width) solid var(--text); border-radius: var(--radius); }
+  @media (max-width: 520px) { .detail { grid-template-columns: 1fr; } }
+  .detail h4 { margin: 2px 0 6px; font: 400 22px/1 var(--font-display); text-transform: uppercase; letter-spacing: .01em; }
+  .tracks { margin: 0; padding: 0; list-style: none; font-size: 12.5px; }
+  .tracks li { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border); padding: 3px 0; }
+  .tracks li span:first-child { font-family: var(--font-mono); color: var(--muted); margin-right: 8px; }
+  .matrix { margin: 6px 0 0; font: 12px/1.6 var(--font-mono); color: var(--text); background: var(--bg); padding: 8px 10px; border-radius: var(--radius);
+    border-left: 4px solid var(--accent); white-space: pre-wrap; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .meta a, .link { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+
+  /* controls */
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 14px 16px 0; }
+  .btn { font: 600 13px var(--font-body); padding: 9px 14px; border-radius: var(--radius); border: 2px solid transparent; cursor: pointer; }
+  .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .btn-accent { background: var(--accent); color: var(--on-accent); }
+  .btn-hot { background: var(--hot); color: var(--on-hot); transform: rotate(-1.5deg); }
+  .btn-warm { background: var(--warm); color: var(--on-warm); }
+  .btn-ghost { background: transparent; color: var(--text); border-color: var(--text); }
+  .field { flex: 1 1 180px; min-width: 160px; font: 14px var(--font-body); padding: 9px 12px; border-radius: var(--radius);
+    background: var(--surface); color: var(--text); border: 2px solid var(--border); }
+  .field::placeholder { color: var(--muted); }
+  .field:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  .seg { display: flex; flex-wrap: wrap; border: 2px solid var(--text); border-radius: var(--radius); overflow: hidden; margin: 12px 16px 0; width: fit-content; }
+  .seg button { font: 700 12px var(--font-body); padding: 7px 9px; background: transparent; color: var(--text); border: 0; border-right: 1px solid var(--border); cursor: pointer; }
+  .seg button:last-child { border-right: 0; }
+  .seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+  .seg-label { padding: 7px 10px; font: 600 10px var(--font-eyebrow); letter-spacing: var(--eyebrow-spacing); text-transform: uppercase;
+    color: var(--muted); border-right: 2px solid var(--text); }
+
+  /* empty state + toast */
+  .foot { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; padding: 16px 16px 0; }
+  .empty { display: flex; gap: 12px; align-items: center; padding: 12px; border: 2px dashed var(--border); border-radius: var(--radius); }
+  .xx { width: 54px; height: 62px; flex: none; color: var(--hot); }
+  .empty strong { display: block; font: 400 18px/1.1 var(--font-display); text-transform: uppercase; }
+  [data-theme="riso-night"] .empty strong, [data-theme="riso-day"] .empty strong { font-size: 13px; }
+  .empty span { font-size: 12px; color: var(--muted); }
+  .toast { background: var(--tile); color: var(--tile-fg); font-weight: 700; font-size: 13px; padding: 10px 14px; transform: rotate(2.5deg);
+    box-shadow: 2px 3px 0 rgb(0 0 0 / .35); border-radius: 2px; max-width: 190px; }
+  @media (max-width: 520px) { .foot { grid-template-columns: 1fr; } .toast { justify-self: start; } }
+
+  /* contrast readout */
+  .contrast { display: flex; flex-wrap: wrap; gap: 5px; margin: 16px 16px 0; padding-top: 10px; border-top: 1px dashed var(--border); }
+  .contrast .k { font: 11px var(--font-mono); padding: 2px 6px; border-radius: 3px; background: var(--surface); color: var(--text); }
+  .contrast .k.fail { background: #ffdddd; color: #8a0000; }
+  .contrast .k b { font-weight: 600; }
+  .swatches { display: flex; gap: 4px; margin: 10px 16px 0; flex-wrap: wrap; }
+  .swatches i { width: 26px; height: 26px; border-radius: 3px; border: 1px solid rgb(127 127 127 / .5); }
+
+  /* small screens */
+  .grid > .screen, .shelf > *, .detail > *, .hero > * { min-width: 0; }
+  .seg { max-width: calc(100% - 32px); }
+  .matrix { overflow-x: auto; }
+  @media (max-width: 520px) {
+    .hero { grid-template-columns: 1fr; }
+    .logo-hero { width: 140px; height: 90px; justify-self: start; order: -1; }
+    .ransom { font-size: 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { .card, .btn-hot, .toast, .logo-hero { transform: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="lab-bar">
+  <h1>CTT Theme Lab <small>5 DARK · 5 LIGHT</small></h1>
+  <div class="grp" role="group" aria-label="View">
+    <button type="button" data-view="gallery" aria-pressed="true">Gallery</button>
+    <button type="button" data-view="single" aria-pressed="false">Single</button>
+  </div>
+  <div class="grp" id="single-controls" hidden>
+    <label for="mode">Mode</label>
+    <select id="mode"><option value="system">System</option><option value="dark">Dark</option><option value="light">Light</option></select>
+    <label for="dark-pick">Dark</label><select id="dark-pick"></select>
+    <label for="light-pick">Light</label><select id="light-pick"></select>
+  </div>
+</header>
+
+<main id="gallery">
+  <p class="lab-note">Every color comes from the logo files in <code>/brand/logo</code>. Tokens live in <code>design/themes/themes.css</code>.
+    The strip under each screen shows live WCAG contrast for the pairs that matter (4.5 for text, 3 for large text and UI). Album covers are made-up placeholders and stay the same in every theme, just like real cover art would.</p>
+  <h2 class="lab-h2">Dark <span>Night shift</span></h2>
+  <div class="grid" id="dark-grid"></div>
+  <h2 class="lab-h2">Light <span>Day print</span></h2>
+  <div class="grid" id="light-grid"></div>
+</main>
+
+<main id="single" hidden></main>
+
+<template id="screen-tpl">
+  <article class="screen">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="tb">
+      <span class="logo-sleeve" role="img" aria-label="Collectors' Tune Tracker"></span>
+      <nav aria-label="Main"><a href="#" aria-current="page">Shelf</a><a href="#">Search</a><a href="#">Crates</a><a href="#">Wants</a><a href="#">You</a></nav>
+      <button class="btn btn-accent" type="button">+ Add</button>
+    </div>
+    <div class="hero">
+      <div>
+        <p class="eyebrow js-code"></p>
+        <h3 class="ransom js-title"></h3>
+        <p class="blurb js-blurb"></p>
+      </div>
+      <span class="logo-hero" aria-hidden="true"></span>
+    </div>
+    <svg class="drips" viewBox="0 0 600 22" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="currentColor" d="M0 0h600v4c-8 0-9 3-10 8s-2 9-5 9-4-5-4-9-2-6-8-6H460c-6 0-7 3-7 6s-1 6-3 6-3-3-3-6-1-6-6-6H300c-5 0-6 4-6 9s-2 10-5 10-4-5-4-10-1-9-7-9H160c-6 0-7 2-7 5s-1 5-3 5-3-2-3-5-1-5-6-5H60c-6 0-7 4-7 8s-1 7-3 7-3-3-3-7-1-8-7-8H0z"/>
+    </svg>
+    <div class="row-head"><p class="eyebrow">Main shelf · 4 of 1,284</p><span class="script">Collectors'</span></div>
+    <div class="shelf">
+      <figure class="card"><div class="cover c1"><span class="pill">LP</span></div><b>Night Signals</b><span class="artist">Static Bloom</span>
+        <div class="grades"><span class="grade g-top">NM</span><span class="grade g-mid">VG+</span></div></figure>
+      <figure class="card"><div class="cover c2"><span class="pill">7"</span></div><b>Dead Wax Sermons</b><span class="artist">The Rust Choir</span>
+        <div class="grades"><span class="grade g-mid">VG</span><span class="grade g-low">G+</span></div></figure>
+      <figure class="card"><div class="cover c3"><span class="pill">CD</span></div><b>Pressing Matters</b><span class="artist">Velvet Ruin</span>
+        <div class="grades"><span class="grade g-top">M</span><span class="grade g-top">NM</span></div></figure>
+      <figure class="card"><div class="cover c4"><span class="pill">CS</span></div><b>Side B Forever</b><span class="artist">Gutter Saints</span>
+        <div class="grades"><span class="grade g-low">G</span><span class="grade g-poor">F</span></div></figure>
+    </div>
+    <div class="detail">
+      <div>
+        <p class="eyebrow">Your copy</p>
+        <h4>Night Signals</h4>
+        <ol class="tracks">
+          <li><span>A1</span><span>Low Frequency Saints</span></li>
+          <li><span>A2</span><span>Runout Groove</span></li>
+          <li><span>B1</span><span>Crackle &amp; Hiss</span></li>
+        </ol>
+      </div>
+      <div>
+        <p class="eyebrow">Matrix / runout</p>
+        <pre class="matrix">A: NSR-001-A1 ▽ STERLING
+B: NSR-001-B2 ▽ "dig deeper"</pre>
+        <p class="meta">1st press · 180g · translucent red · Shelf B3 / slot 12 · <a href="#">3 other pressings</a></p>
+      </div>
+    </div>
+    <div class="seg" role="group" aria-label="Media grade">
+      <span class="seg-label">Media</span>
+      <button type="button" aria-pressed="false">M</button><button type="button" aria-pressed="true">NM</button>
+      <button type="button" aria-pressed="false">VG+</button><button type="button" aria-pressed="false">VG</button>
+      <button type="button" aria-pressed="false">G+</button><button type="button" aria-pressed="false">G</button>
+      <button type="button" aria-pressed="false">F</button><button type="button" aria-pressed="false">P</button>
+    </div>
+    <div class="controls">
+      <button class="btn btn-accent" type="button">Save to shelf</button>
+      <button class="btn btn-hot" type="button">Want it</button>
+      <button class="btn btn-warm" type="button">Value: $42</button>
+      <button class="btn btn-ghost" type="button">Cancel</button>
+      <input class="field" type="search" placeholder="Search your crates…" aria-label="Search">
+    </div>
+    <div class="foot">
+      <div class="empty">
+        <svg class="xx" viewBox="0 0 54 62" aria-hidden="true">
+          <circle cx="27" cy="25" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
+          <path d="M14 15l9 9M23 15l-9 9M31 15l9 9M40 15l-9 9" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <path d="M16 37c4-6 18-6 22 0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <path d="M12 42v10M40 44v14M25 47v6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div><strong>Nothing in the crate yet.</strong><span>Add your first record. Scan the barcode or search.</span></div>
+      </div>
+      <div class="toast">Filed. It's on the shelf.</div>
+    </div>
+    <div class="swatches js-swatches" aria-hidden="true"></div>
+    <div class="contrast js-contrast"></div>
+  </article>
+</template>
+
+<script>
+const THEMES = [
+  { id: "back-room",     code: "D1", name: "Back Room",     mode: "dark",  blurb: "The record shop after hours. Sleeve-badge teal on charcoal. The default." },
+  { id: "spray-can",     code: "D2", name: "Spray Can",     mode: "dark",  blurb: "Pure black wall, signal-orange XX face, drips and hard offset shadows." },
+  { id: "basement-show", code: "D3", name: "Basement Show", mode: "dark",  blurb: "Smoke-grey low ceiling, mustard house lights, warm and loud." },
+  { id: "riso-night",    code: "D4", name: "Riso Night",    mode: "dark",  blurb: "Two-ink riso on black stock: teal and fluoro orange, out of register." },
+  { id: "xerox-black",   code: "D5", name: "Xerox Black",   mode: "dark",  blurb: "Monochrome photocopy. Toner and paper, one orange stamp for danger." },
+  { id: "cream-sleeve",  code: "L1", name: "Cream Sleeve",  mode: "light", blurb: "Cream stock, charcoal ink, deep-teal accents. The light default." },
+  { id: "photocopy",     code: "L2", name: "Photocopy",     mode: "light", blurb: "Cold copy-shop paper, black toner, one red rubber stamp." },
+  { id: "newsprint",     code: "L3", name: "Newsprint",     mode: "light", blurb: "Warm grey pulp, serif headlines, mustard highlighter swipes." },
+  { id: "riso-day",      code: "L4", name: "Riso Day",      mode: "light", blurb: "Cream stock with teal and orange riso inks, slightly misregistered." },
+  { id: "gig-flyer",     code: "L5", name: "Gig Flyer",     mode: "light", blurb: "Mustard flyer on a telephone pole. Charcoal ink, cream paste-ups." },
+];
+
+const RANSOM_FONTS = [
+  ["Anton", 400, 1], ["Special Elite", 400, .92], ["Rubik Mono One", 400, .78], ["Playfair Display", 900, 1.02], ["Courier Prime", 700, .95],
+];
+
+// Deterministic PRNG so a title always looks the same.
+function seeded(str) {
+  let h = 2166136261;
+  for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; };
+}
+
+function ransom(el, text) {
+  el.textContent = "";
+  el.setAttribute("aria-label", text);
+  const rnd = seeded(text);
+  for (const ch of text) {
+    const s = document.createElement("span");
+    s.setAttribute("aria-hidden", "true");
+    if (ch === " ") { s.className = "sp"; el.append(s); continue; }
+    const [fam, wt, scale] = RANSOM_FONTS[Math.floor(rnd() * RANSOM_FONTS.length)];
+    const alt = rnd() < 0.3;
+    s.className = "t";
+    s.textContent = ch;
+    Object.assign(s.style, {
+      fontFamily: `"${fam}"`, fontWeight: wt, fontSize: `${(0.9 + rnd() * 0.3) * scale}em`,
+      transform: `rotate(${(rnd() * 8 - 4).toFixed(1)}deg) translateY(${(rnd() * 4 - 2).toFixed(1)}px)`,
+      background: alt ? "var(--tile2)" : "var(--tile)", color: alt ? "var(--tile2-fg)" : "var(--tile-fg)",
+    });
+    el.append(s);
+  }
+}
+
+// WCAG 2 contrast
+function lum(hex) {
+  const m = hex.trim().replace("#", "");
+  const c = [0, 2, 4].map(i => parseInt(m.slice(i, i + 2), 16) / 255).map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+const PAIRS = [
+  ["text", "bg", 4.5], ["muted", "bg", 4.5], ["muted", "surface", 4.5], ["accent", "bg", 3],
+  ["on-accent", "accent", 4.5], ["on-hot", "hot", 4.5], ["on-warm", "warm", 4.5], ["tile-fg", "tile", 4.5], ["tile2-fg", "tile2", 4.5],
+];
+const SWATCH_KEYS = ["bg", "surface", "sunken", "text", "muted", "accent", "hot", "warm", "tile", "tile2"];
+
+function renderContrast(screen) {
+  const cs = getComputedStyle(screen);
+  const v = k => cs.getPropertyValue(`--${k}`).trim();
+  const box = screen.querySelector(".js-contrast");
+  box.textContent = "";
+  for (const [a, b, min] of PAIRS) {
+    const r = ratio(v(a), v(b));
+    const k = document.createElement("span");
+    k.className = "k" + (r < min ? " fail" : "");
+    k.innerHTML = `${a}/${b} <b>${r.toFixed(2)}</b> ${r >= min ? "✓" : "✗"}`;
+    box.append(k);
+  }
+  const sw = screen.querySelector(".js-swatches");
+  sw.textContent = "";
+  for (const key of SWATCH_KEYS) {
+    const i = document.createElement("i");
+    i.style.background = v(key);
+    i.title = `--${key} ${v(key)}`;
+    sw.append(i);
+  }
+}
+
+function buildScreen(theme, full = false) {
+  const node = document.getElementById("screen-tpl").content.firstElementChild.cloneNode(true);
+  applyTheme(node, theme);
+  if (full) node.classList.add("full");
+  return node;
+}
+
+function applyTheme(node, theme) {
+  node.dataset.theme = theme.id;
+  node.setAttribute("aria-label", `${theme.name} theme preview`);
+  node.querySelector(".js-code").textContent = `${theme.code} · ${theme.mode} theme · ${theme.id}`;
+  node.querySelector(".js-blurb").textContent = theme.blurb;
+  ransom(node.querySelector(".js-title"), theme.name.toUpperCase());
+}
+
+// Gallery
+const darkGrid = document.getElementById("dark-grid");
+const lightGrid = document.getElementById("light-grid");
+for (const t of THEMES) (t.mode === "dark" ? darkGrid : lightGrid).append(buildScreen(t));
+
+// Single view with System / Dark / Light
+const store = {
+  get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+const modeSel = document.getElementById("mode");
+const darkSel = document.getElementById("dark-pick");
+const lightSel = document.getElementById("light-pick");
+for (const t of THEMES) (t.mode === "dark" ? darkSel : lightSel).add(new Option(`${t.code} ${t.name}`, t.id));
+modeSel.value = store.get("ctt-lab-mode", "system");
+darkSel.value = store.get("ctt-lab-dark", "back-room");
+lightSel.value = store.get("ctt-lab-light", "cream-sleeve");
+
+const single = document.getElementById("single");
+const mq = matchMedia("(prefers-color-scheme: dark)");
+let singleScreen = null;
+
+function resolveTheme() {
+  const mode = modeSel.value === "system" ? (mq.matches ? "dark" : "light") : modeSel.value;
+  return THEMES.find(t => t.id === (mode === "dark" ? darkSel.value : lightSel.value));
+}
+function renderSingle() {
+  const t = resolveTheme();
+  if (!singleScreen) { singleScreen = buildScreen(t, true); single.append(singleScreen); }
+  else applyTheme(singleScreen, t);
+  requestAnimationFrame(() => renderContrast(singleScreen));
+}
+for (const el of [modeSel, darkSel, lightSel]) el.addEventListener("change", () => {
+  store.set("ctt-lab-mode", modeSel.value); store.set("ctt-lab-dark", darkSel.value); store.set("ctt-lab-light", lightSel.value);
+  renderSingle();
+});
+mq.addEventListener("change", () => { if (modeSel.value === "system") renderSingle(); });
+
+// View toggle
+function setView(view) {
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+  document.getElementById("gallery").hidden = view !== "gallery";
+  single.hidden = view !== "single";
+  document.getElementById("single-controls").hidden = view !== "single";
+  if (view === "single") renderSingle();
+  store.set("ctt-lab-view", view);
+}
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+
+// Grade picker interaction
+document.addEventListener("click", e => {
+  const b = e.target.closest(".seg button");
+  if (!b) return;
+  b.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+});
+
+document.fonts.ready.then(() => document.querySelectorAll(".screen").forEach(renderContrast));
+document.querySelectorAll(".screen").forEach(renderContrast);
+setView(store.get("ctt-lab-view", "gallery"));
+</script>
+</body>
+</html>
