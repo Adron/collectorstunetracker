@@ -3,10 +3,17 @@
  * Uses DATABASE_URL_UNPOOLED (Neon direct connection) or DATABASE_URL.
  *   node src/migrate.ts          apply pending migrations
  *   node src/migrate.ts --reset  drop CTT's schemas and re-apply (local/dev only)
+ *   node src/migrate.ts --build  used by the Vercel build: migrates only production deployments
+ *                                (previews share the production database until Neon preview branching is on)
  */
 import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
+
+if (process.argv.includes("--build") && process.env.VERCEL_ENV !== "production") {
+  console.log(`migrate: skipped (build for ${process.env.VERCEL_ENV ?? "local"})`);
+  process.exit(0);
+}
 
 const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 if (!url) {
