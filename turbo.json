@@ -2,9 +2,44 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "stream",
   "tasks": {
-    "build": { "dependsOn": ["^build"], "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**"] },
-    "dev": { "cache": false, "persistent": true },
-    "typecheck": { "dependsOn": ["^typecheck"] },
-    "test": { "dependsOn": ["^build"], "outputs": [] }
-  }
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "out/**",
+        "dist/**"
+      ],
+      "env": [
+        "DATABASE_URL",
+        "DATABASE_URL_UNPOOLED",
+        "NEXT_PUBLIC_*"
+      ],
+      "passThroughEnv": [
+        "BLOB_READ_WRITE_TOKEN"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^typecheck"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": []
+    }
+  },
+  "globalPassThroughEnv": [
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "CI"
+  ]
 }
