@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Courier+Prime:wght@700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@900&family=Rubik+Mono+One&family=Space+Grotesk:wght@400;500;600;700&family=Special+Elite&family=Yellowtail&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="../../packages/ui/src/themes.css">
 <style>
   /* ---------- Lab chrome (not part of the themes) ---------- */
   * { box-sizing: border-box; }
@@ -44,7 +44,7 @@
 
   /* top bar */
   .tb { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: var(--rule-width) solid var(--text); }
-  .logo-sleeve { width: 52px; height: 52px; background: var(--logo-sleeve) center 46%/210% no-repeat; flex: none; }
+  .logo-sleeve { width: 52px; height: 52px; background: var(--logo-sleeve) center/contain no-repeat; flex: none; }
   .tb nav { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
   .tb nav a { color: var(--muted); text-decoration: none; font-family: var(--font-eyebrow); font-size: 11px; font-weight: 600;
     letter-spacing: var(--eyebrow-spacing); text-transform: uppercase; padding: 6px 8px; border-radius: var(--radius); }
@@ -53,7 +53,7 @@
   /* hero */
   .hero { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; padding: 18px 16px 6px; }
   .hero .blurb { margin: 8px 0 0; color: var(--muted); font-size: 13px; max-width: 34ch; }
-  .logo-hero { width: 170px; height: 110px; background: var(--logo-hero) center/150% no-repeat; transform: rotate(var(--tilt)); }
+  .logo-hero { width: 170px; height: 110px; background: var(--logo-hero) center/contain no-repeat; transform: rotate(var(--tilt)); }
   .drips { display: block; width: 100%; height: 22px; color: var(--accent); margin-top: -2px; }
 
   /* ransom title */
@@ -171,7 +171,7 @@
 </header>
 
 <main id="gallery">
-  <p class="lab-note">Every color comes from the logo files in <code>/brand/logo</code>. Tokens live in <code>design/themes/themes.css</code>.
+  <p class="lab-note">Every color comes from the logo files in <code>/brand/logo</code>. Tokens live in <code>packages/ui/src/themes.css</code>.
     The strip under each screen shows live WCAG contrast for the pairs that matter (4.5 for text, 3 for large text and UI). Album covers are made-up placeholders and stay the same in every theme, just like real cover art would.</p>
   <h2 class="lab-h2">Dark <span>Night shift</span></h2>
   <div class="grid" id="dark-grid"></div>

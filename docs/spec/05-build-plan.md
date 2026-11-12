@@ -26,16 +26,17 @@
 | C2 | `git subtree add --prefix=legacy/database` from `collectorstunetracker_db@main` (history preserved) | ✅ done |
 | C3 | Copy logo assets from `collectors_tracker_docs` into `/brand/logo` | ✅ done |
 | C4 | Spec docs `/docs/spec/01–09`, runbooks, README | ✅ done |
-| C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (Q3) | ⏳ needs a `gh` token with `delete_repo` scope, or delete it on GitHub |
-| C6 | Remove the CRA prototype (`src/`, `public/`, `package*.json`) when the Phase 0 scaffold lands | ⏳ Phase 0 |
-| C7 | Delete branches `adding-project-skeleton-defaults` and `release` | ⏳ you: `git push origin --delete adding-project-skeleton-defaults release` |
+| C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (Q3); its history is verified in `main` | ⏳ needs a `gh` token with `delete_repo` scope, or delete it on GitHub |
+| C6 | Remove the CRA prototype (`src/`, `public/`, `package*.json`) | ✅ done (Phase 0) |
+| C7 | Delete branches `adding-project-skeleton-defaults` and `release` | ✅ done |
 | C7b | Delete `collectors_tracker_docs` once the new marketing site is live | ⏳ Phase 0 exit |
 | C8 | Delete `legacy/` once the new schema is in production | ⏳ Phase 3 |
 | C9 | `LICENSE` → proprietary | ✅ done |
 | C10 | Theme lab: 5 dark + 5 light themes (`design/themes`) | ✅ done, approved |
 | C11 | Fix the stuck Vercel purchase of `collectorstunetracker.com` ([08 §5](08-hosting-costs-and-scaling.md#5-domain-collectorstunetrackercom)) | ⏳ you |
 | C12 | Substratal onboarding ([setup-on-substratal.md](../setup-on-substratal.md)) | ⏳ you |
-| C13 | Merge this branch into `main` (via PR) before the Phase 0 scaffold starts | ⏳ |
+| C13 | Merge the spec branch into `main` before the Phase 0 scaffold starts | ✅ done |
+| C14 | Neon database (`ctt-db`, free, `iad1`) and Blob store (`ctt-media`, private) connected to `ctt-app` | ✅ done |
 
 ## 3. Phased build (Vercel + Neon)
 
@@ -43,7 +44,7 @@ Every phase deploys to Vercel previews on each PR and to production on merge. Ea
 matching milestone.
 
 ### Phase 0 — Foundations (≈1–1½ weeks)
-- Turborepo/pnpm monorepo per [04 §4](04-architecture.md#4-repository--projects); remove the CRA prototype.
+- Turborepo + npm workspaces monorepo per [04 §4](04-architecture.md#4-repository--projects); remove the CRA prototype.
 - Vercel projects `ctt-site` and `ctt-app` in `ctt-a-team`; Neon integration (Free, `us-east-1`, preview branches);
   Blob store; environment variables; `CRON_SECRET`.
 - CI (GitHub Actions): lint, typecheck, Vitest, Playwright + axe against previews, migrations against Postgres 16 in Docker.

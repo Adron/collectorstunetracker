@@ -59,7 +59,7 @@ flowchart LR
 
 ## 4. Repository & projects
 
-Turborepo + pnpm monorepo. Two Vercel projects from the same repo:
+Turborepo + npm workspaces monorepo (no extra package manager to install). Two Vercel projects from the same repo:
 
 ```
 collectorstunetracker/
@@ -90,7 +90,7 @@ collectorstunetracker/
 | Framework | **Next.js (App Router, current stable), React 19, TypeScript** | First-class on Vercel; server rendering for public shelves (fast, good link previews); route handlers replace the planned Go BFF |
 | UI primitives | **react-aria-components** | Accessible controls (same choice as the Substratal Hub) |
 | Styling | **Plain CSS + design tokens** from `design/themes/themes.css` | Same tokens as the theme lab; no Tailwind |
-| Data access | **Drizzle ORM** over `@neondatabase/serverless` (pooled) | Typed queries; migrations are plain SQL files checked into git (portable to Aurora) |
+| Data access | **Drizzle ORM** over the standard **`pg`** driver, using Neon's pooled connection string | Typed queries; the same driver works on local Postgres, Neon, and Aurora; migrations are plain SQL files checked into git |
 | Validation | **Zod** | Shared by forms, route handlers, and importers |
 | Media | **@vercel/blob** (client uploads) + **sharp** in Node functions | Direct browser → Blob uploads; renditions made server-side |
 | Tests | Vitest, Testing Library, Playwright (+ axe), Postgres 16 in Docker for integration tests | Same portability check as before: everything must pass on stock Postgres |
@@ -123,7 +123,7 @@ collectorstunetracker/
   preview; `dev` for local work. Neon Free allows 10 branches per project, which is enough for a solo dev.
 - **Migrations:** `packages/db/migrations/*.sql` run against `DATABASE_URL_UNPOOLED` in the Vercel build step for
   preview and production (or manually with `pnpm db:migrate`).
-- **RLS:** each request's transaction sets `ctt.sub` / `ctt.org`, and policies enforce ownership (defense in depth).
+- **RLS:** each request's transaction sets `ctt.sub` / `ctt.org`, and policies enforce ownership (defense in depth). Runtime connections use `pg` with the pooled URL; Vercel Fluid compute reuses the pool across requests.
 - **Search:** Postgres full text (`tsvector`) plus `pg_trgm`, both available on Neon.
 - **Free plan limits to respect:** 1 GB storage, 100 CU-hours/month (scales to zero after 5 minutes idle), 5 GB egress,
   6 hours of point-in-time history. Mitigations: lazy catalog (no MusicBrainz mirror), nightly logical backup (`pg_dump` to private
