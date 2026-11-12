@@ -120,8 +120,11 @@ cat > /tmp/ctt-app.json <<'JSON'
   "settings_schema": {
     "type": "object",
     "properties": {
-      "theme":        { "type": "string", "enum": ["system", "dark", "light"], "default": "system" },
+      "theme_mode":   { "type": "string", "enum": ["system", "light", "dark"], "default": "system" },
+      "theme_light":  { "type": "string", "enum": ["cream-sleeve", "photocopy", "newsprint", "riso-day", "gig-flyer"], "default": "cream-sleeve" },
+      "theme_dark":   { "type": "string", "enum": ["back-room", "spray-can", "basement-show", "riso-night", "xerox-black"], "default": "back-room" },
       "shelf_view":   { "type": "string", "enum": ["grid", "crate", "list"], "default": "grid" },
+      "show_values":  { "type": "boolean", "default": false },
       "currency":     { "type": "string", "pattern": "^[A-Z]{3}$", "default": "USD" },
       "grading_scale":{ "type": "string", "enum": ["goldmine"], "default": "goldmine" },
       "reduce_motion":{ "type": "boolean", "default": false }

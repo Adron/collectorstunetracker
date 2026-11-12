@@ -1,6 +1,6 @@
 # 05 — Consolidation & Build Plan
 
-> Status: **Draft v0.1** · 2026-11-09 · Goal: one repo, built fresh, that **entirely replaces** the current
+> Status: **Draft v0.2** · 2026-11-12 · Goal: one repo, built fresh, that **entirely replaces** the current
 > CRA/Next hybrid prototype and the separate `collectorstunetracker_db` repo — keeping the brand and vibe.
 
 ## 1. What exists today (audit)
@@ -8,11 +8,11 @@
 | Where | What | Assessment |
 |---|---|---|
 | `main` — `src/` | Create React App + react-router; Login/Dashboard/Collections/About stubs; no styling beyond CRA defaults | Throwaway. Broken by design: a Next.js API route (`src/pages/api/login.ts`) inside a CRA app never runs; user object stored in `localStorage`; `App.test.js` tests for "learn react" text that doesn't exist. |
-| `main` — `src/db.ts` | Kysely + `@vercel/postgres` with a `users` table | Replaced by Substratal identity + Go API. |
+| `main` — `src/db.ts` | Kysely + `@vercel/postgres` with a `users` table | Replaced by Substratal identity + the new Next.js app on Neon. |
 | `main` — `package.json` | CRA 5 (deprecated), Next 14, Vercel analytics/postgres, bcryptjs | All removed. |
 | `main` — `public/` | CRA default icons/manifest ("React App") | Replaced with brand icons/manifest. |
-| `main` — `.gitignore` | Two ignore files concatenated (Gradle/Java + CRA) | Rewritten for Go + Node + Terraform. |
-| `main` — `LICENSE` | **Empty file** | Needs a decision (Q5). |
+| `main` — `.gitignore` | Two ignore files concatenated (Gradle/Java + CRA) | Rewritten for the pnpm/Turborepo monorepo. |
+| `main` — `LICENSE` | Was empty | ✅ Now proprietary (Q5). |
 | branch `collectors_tracker_docs` | Logo system (14 PNG, 12 JPG, 9 GIF, banners) + README for GitHub Pages | **Kept** — copied into `/brand/logo`. Basis for [02](02-brand-and-design.md). |
 | branch `adding-project-skeleton-defaults` | Spring Boot/Gradle skeleton, Flyway-style migrations, committed `.gradle/` and `build/` output | Superseded. Migrations are the same as the DB repo's (minus `email`). |
 | branch `release` | Initial commit + ignore | Empty. |
@@ -25,73 +25,89 @@
 | C1 | Create branch `replatform/spec-and-db-consolidation` | ✅ done |
 | C2 | `git subtree add --prefix=legacy/database` from `collectorstunetracker_db@main` (history preserved) | ✅ done |
 | C3 | Copy logo assets from `collectors_tracker_docs` into `/brand/logo` | ✅ done |
-| C4 | Write spec docs `/docs/spec/01–06` and new README | ✅ done (this PR) |
-| C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (decided Q3). Branch with its history is pushed. | ⏳ blocked: `gh` token lacks `delete_repo` scope |
-| C6 | Remove the CRA/Next prototype (`src/`, `public/`, `package*.json`) once Phase 0 scaffolding lands | ⏳ Phase 0 |
+| C4 | Spec docs `/docs/spec/01–09`, runbooks, README | ✅ done |
+| C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (Q3) | ⏳ needs a `gh` token with `delete_repo` scope, or delete it on GitHub |
+| C6 | Remove the CRA prototype (`src/`, `public/`, `package*.json`) when the Phase 0 scaffold lands | ⏳ Phase 0 |
 | C7 | Delete branches `adding-project-skeleton-defaults` and `release` | ⏳ you: `git push origin --delete adding-project-skeleton-defaults release` |
-| C7b | Delete `collectors_tracker_docs` once the new marketing site is live on `collectorstunetracker.com` | ⏳ Phase 1 |
+| C7b | Delete `collectors_tracker_docs` once the new marketing site is live | ⏳ Phase 0 exit |
+| C8 | Delete `legacy/` once the new schema is in production | ⏳ Phase 3 |
 | C9 | `LICENSE` → proprietary | ✅ done |
-| C10 | DNS to Route 53, then registrar transfer from Vercel ([setup-domain-on-aws.md](../setup-domain-on-aws.md)) | ⏳ you, Phase 0 |
-| C11 | Substratal onboarding ([setup-on-substratal.md](../setup-on-substratal.md)) | ⏳ you, Phase 0 |
-| C8 | Delete `legacy/` once the new schema has shipped to prod (history stays in git) | ⏳ Phase 3 |
+| C10 | Theme lab: 5 dark + 5 light themes (`design/themes`) | ✅ done, approved |
+| C11 | Fix the stuck Vercel purchase of `collectorstunetracker.com` ([08 §5](08-hosting-costs-and-scaling.md#5-domain-collectorstunetrackercom)) | ⏳ you |
+| C12 | Substratal onboarding ([setup-on-substratal.md](../setup-on-substratal.md)) | ⏳ you |
+| C13 | Merge this branch into `main` (via PR) before the Phase 0 scaffold starts | ⏳ |
 
-## 3. Phased build
+## 3. Phased build (Vercel + Neon)
 
-Each phase ends deployable to `dev`; phases 2+ also to `prod`.
+Every phase deploys to Vercel previews on each PR and to production on merge. Each phase has GitHub issues under a
+matching milestone.
 
-### Phase 0 — Foundations (≈1–2 weeks)
-- Monorepo scaffolding per [04 §9](04-architecture.md#9-repository-layout-target): Go module, `apps/web` (Vite + React 19 + TS), `api/openapi.yaml`, `db/`, `infra/terraform/`.
-- Terraform bootstrap: state, GitHub OIDC role, `dev` env: CloudFront + S3 web, HTTP API + `api`/`bff` Lambdas, `ctt` database + roles in the shared Aurora cluster (bootstrap SQL, Data API), CI against stock `postgres:16`.
-- Route 53 hosted zone for `collectorstunetracker.com` (records imported from Vercel), ACM certs, CloudFront for apex/`www` (site) and `app.` (app).
-- Substratal customer onboarding, done by hand following [setup-on-substratal.md](../setup-on-substratal.md): the `admin-ctt@thrashingcode.com` account, the **Collectors' Tune Tracker** org, and `app_ctt` / `app_ctt-dev` through Substratal review like any customer.
-- BFF login/logout/refresh with hosted PKCE; JWT verification middleware; RLS `SET LOCAL` plumbing.
-- Design tokens (`tokens.css`), fonts, app shell, sleeve-badge favicon/PWA icons, `<RansomTitle>`, empty states, 404.
-- CI: Go test/lint, web typecheck/test, `terraform plan` on PR.
-- `apps/site`: first cut of the marketing page at `collectorstunetracker.com` (zine hero, what CTT is, **Log in** → `app.`).
-- **Exit:** sign in with Substratal → see an empty, on-brand shelf on `app.dev`. *(Depends on Q16: the hosted sign-in page must be live. Until it is, the exit is "PKCE flow passes against a contract-level mock".)*
+### Phase 0 — Foundations (≈1–1½ weeks)
+- Turborepo/pnpm monorepo per [04 §4](04-architecture.md#4-repository--projects); remove the CRA prototype.
+- Vercel projects `ctt-site` and `ctt-app` in `ctt-a-team`; Neon integration (Free, `us-east-1`, preview branches);
+  Blob store; environment variables; `CRON_SECRET`.
+- CI (GitHub Actions): lint, typecheck, Vitest, Playwright + axe against previews, migrations against Postgres 16 in Docker.
+- **Theme system** ([#7](https://github.com/Adron/collectorstunetracker/issues/7): System / Light / Dark with per-mode theme choice, no flash), fonts, app shell, `RansomTitle`, XX face,
+  empty states, 404, favicons and PWA icons from the sleeve badge.
+- Marketing site at `collectorstunetracker.com` with **Log in** → `app.`.
+- Auth: Substratal PKCE login/callback/logout, database sessions, webhook endpoint; local mock of the authorize/token endpoints.
+- **Exit:** themed app shell on `app.` (mock login until Q16 clears), marketing site live.
 
-### Phase 1 — Collect (MVP core) (≈3–4 weeks)
-- Migrations: `format` (seeded), `collection`, `item`, `item_condition`, `location`, `tag`, `item_image`.
-- CRUD API + UI: collections, items (free-form, no catalog yet), Goldmine grading, locations, tags.
-- **Images:** presigned upload, image-worker (renditions, EXIF strip), CloudFront signed cookies, capture flow with typed steps.
-- Shelf grid/list views, filters, sort; item "sleeve" detail page.
-- Export (CSV/JSON).
-- **Exit:** a collector can catalog 100 records with photos, entirely by hand, on phone and desktop.
+### Phase 1 — Collect (≈2–3 weeks)
+- Migrations: `collector`, `collection`, `item_group` (nested), `item`, `item_condition`, `location`, `tag`, `format` (seeded), `item_image`, `app.job`.
+- Collections and nested groups (create, rename, reorder, move, archive); items of every kind (album, single, EP, box set,
+  tape, CD, digital, memorabilia, merch, gear); Goldmine grading; provenance; public/private notes.
+- Images: client upload to Blob, sharp processing job, `/media` delivery route, typed capture flow.
+- Shelf grid, crate and list views; filters and sort; the item "sleeve" page.
+- **Exit:** a collector can catalog 100 items with photos, organized in groups, on phone and desktop.
 
-### Phase 2 — Catalog & Identify (≈4 weeks)
-- Catalog tables (party, work, release, medium, track, credit, label, identifier) + `external_ref`, `lookup_cache`.
-- MusicBrainz lookup + Cover Art Archive fallback; barcode scanning; text/cat# search; "pick your pressing" compare UI.
-- Discogs CSV import with dry run + match review; generic CSV import.
-- Search (`tsvector` + `pg_trgm`) across own items + catalog.
-- **First prod launch (private beta).**
+### Phase 2 — Visibility & sharing (≈1½–2 weeks)
+- Profile master switch + collection/group/item visibility with inheritance; `effective_visibility` maintenance; the
+  `public_item_v` read model; unlisted tokens.
+- Visibility UI: effective-state badges with reasons, "this will show N items" confirmations, bulk changes.
+- Public pages (`/@handle`, collection, group, item, crate) with ISR, cache-tag revalidation, JSON-LD, OG images.
+- Crates and wants.
+- **Exit:** privacy test suite passes (no private field or private item is reachable by any public route, cached or not).
 
-### Phase 3 — Beyond records (≈3 weeks)
-- Memorabilia, print, apparel, gear kinds; events, venues, lineups, setlists; show history.
-- Signatures/COA; loans; listening log; want list; crates.
-- Public/unlisted shelves (zine-styled public page).
-- Remove `legacy/`.
+### Phase 3 — Import, export & identify (≈2–3 weeks) → **private beta launch**
+- Exports: CTT JSON, Discogs CSV, full CSV, JSON-LD, full archive zip (background job, signed link).
+- Imports: Discogs CSV, generic CSV with mapping, CTT JSON/archive; dry run, matching, duplicate handling; resumable jobs.
+- Catalog tables (lazy) + MusicBrainz lookup + Cover Art Archive fallback; barcode scan; "pick your pressing".
+- Search (`tsvector` + `pg_trgm`).
+- Nightly database backup to Blob; spend alerts.
+- **Exit:** private beta on `app.collectorstunetracker.com`.
 
-### Phase 4 — The Graph & polish (≈4 weeks)
-- Relationship edges, Explore pages (artist/person/label/event), rabbit-hole navigation with breadcrumb trail.
-- Catalog edit submissions + moderation (curator role).
-- Stats dashboards; notifications via Substratal (loan due, import done, want found).
-- OCR assist for runout/label photos.
-- Offline capture queue (background sync).
+### Phase 4 — Sell & trade (≈1½–2 weeks)
+- Listings (sale / trade / both), snapshots, status flow, expiry; Market page with filters; seller listings on profiles.
+- Conversations and messages; notifications through Substratal; reporting and a moderation queue; rate limits; the
+  unofficial-items rule.
+- Terms of service and listing rules pages.
+- **Exit:** public launch candidate.
+
+### Phase 5 — Beyond records & the graph
+- Events, venues, setlists, show history; signatures/COA; loans; listening log.
+- Explore pages, credits graph, rabbit-hole navigation; catalog edits + curator moderation.
+- Discogs account sync (OAuth), CLZ/MusicBuddy templates; OCR assist; offline capture queue.
 
 ### Later
-Native apps (reuse API; Substratal SwiftUI/Compose shells), valuation feeds, shop/club orgs, marketplace, Bedrock-generated "liner notes" summaries from the graph.
+Payments (Stripe Connect), offers and feedback, native apps, valuation feeds, shop/club organizations, and the AWS
+moves in [08 §4](08-hosting-costs-and-scaling.md#4-when-to-move-what) as traffic warrants.
 
 ## 4. Definition of done (every phase)
-- OpenAPI updated and codegen clean; Go unit tests + API integration tests against a real Postgres (Docker) with RLS on.
-- Playwright e2e for the phase's main flow; axe accessibility scan clean; contrast tests pass against tokens.
-- Terraform applied to `dev` from CI; runbook notes for any new alarm.
-- Brand review: screens checked against [02](02-brand-and-design.md) (tokens only, no stray hex values).
+- Unit tests for `packages/core` (visibility, importers, exporters) and integration tests against Postgres 16 with RLS on.
+- Playwright e2e for the phase's main flow in **one light and one dark theme**; axe scan clean; contrast tests pass.
+- Privacy tests for anything that touches public routes.
+- Preview deployment reviewed; migrations applied cleanly on a Neon branch.
+- Brand review against [02](02-brand-and-design.md): tokens only, no stray hex values.
 
 ## 5. Risks
+
 | Risk | Mitigation |
 |---|---|
-| Catalog data licensing (Discogs, cover art) | MusicBrainz-first; store references + attribution; legal check before public launch |
-| HEIC/libvips packaging on Lambda | Container image; fallback to Node `sharp` |
-| Shared Aurora cluster coupling with Substratal | Separate DB roles/schema now; documented path to a dedicated cluster |
-| Data API limits (1 MB result, latency) | Cursor pagination, narrow selects; reassess with RDS Proxy + VPC if needed |
-| Ransom-note aesthetic hurting usability | Strictly limited to heroes/empty states; tokens + contrast tests in CI |
+| Substratal hosted sign-in page not live (Q16) | Build against a mock; real login is a config switch |
+| Vercel ruling image traffic ineligible for flat-rate CDN | Budget for on-demand ([08 §3](08-hosting-costs-and-scaling.md#3-cost-scenarios)); `MediaStore` lets images move to S3 + CloudFront |
+| Neon Free limits (1 GB, 100 CU-hours) | Lazy catalog, usage alerts, upgrade to Launch at 70% |
+| Privacy leak through caching | Synchronous revalidation on visibility decreases; privacy test suite; private images never get `public` cache headers |
+| Marketplace abuse or legal exposure | No payments in v1, verified sellers, reports and moderation, no sale of unofficial items, clear terms |
+| Catalog data licensing (Discogs, cover art) | MusicBrainz-first; references and attribution; no bulk-copying Discogs images |
+| Ransom-note aesthetic hurting usability | Limited to heroes and empty states; contrast tests in CI |

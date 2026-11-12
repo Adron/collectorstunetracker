@@ -1,5 +1,9 @@
 # Moving collectorstunetracker.com from Vercel to AWS
 
+> **On hold (2026-11-12).** CTT now launches on Vercel, so the domain stays at Vercel ([08 §5](spec/08-hosting-costs-and-scaling.md#5-domain-collectorstunetrackercom)).
+> Use this runbook only if CTT later moves fully to AWS. Note also that the Vercel purchase of the domain
+> never completed; fix that first.
+
 The domain is registered with Vercel and uses Vercel's DNS. The goal is **DNS in Route 53, managed by CTT's
 Terraform**, and **registration with Route 53 Domains**. These are two separate moves. Do DNS first: it's
 instant to reverse and unblocks the build. The registrar transfer can then run in the background over the

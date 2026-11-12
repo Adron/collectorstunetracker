@@ -2,28 +2,34 @@
 
 ## Decided
 
-| # | Question | Decision (2026-11-09) |
+| # | Question | Decision |
 |---|---|---|
-| Q1 | Database engine & placement | Postgres (Aurora Serverless v2). CTT gets its **own `ctt` database** in the shared Substratal cluster, fully isolated and built to be moved out ([04 §4](04-architecture.md#4-database)). |
-| Q2 | Real data in the legacy schema to migrate? | None assumed: design migration only. |
-| Q3 | Fate of `Adron/collectorstunetracker_db` | **Delete.** History is preserved in `/legacy/database` on the pushed branch. Waiting only on a `gh` token with the `delete_repo` scope. |
-| Q4 | Billing | Free in v1, with storage quotas; billing decided later. |
-| Q5 | License | **Proprietary**, all rights reserved (`LICENSE`). |
-| Q6 | Old branches | Delete `adding-project-skeleton-defaults` and `release` (pending, run by you). `collectors_tracker_docs` stays until the new marketing site ships, then gets deleted (its logos already live in `/brand/logo`). |
-| Q7 | Theme | Punk-zine **everywhere**. Honor only the light/dark bit of Substratal's `sub_theme`; both modes are fully zine ([02 §3.6](02-brand-and-design.md#36-both-modes-are-zine)). |
-| Q9 | Domain | `collectorstunetracker.com` = marketing/product site with **Log in**; `app.collectorstunetracker.com` = the app. Domain moves from Vercel to Route 53 ([setup-domain-on-aws.md](../setup-domain-on-aws.md)). |
-| Q10 | Relationship to Substratal | Standalone **customer** app, self-registered by `admin-ctt@thrashingcode.com` under the **Collectors' Tune Tracker** org; public API only ([setup-on-substratal.md](../setup-on-substratal.md)). |
-| Q11 | Backend language | Go. |
-| Q13 | Sibling `shows` repo | Unrelated. Ignored. |
+| Q1 | Database | PostgreSQL. **Revised 2026-11-12:** a dedicated **Neon** project on the Vercel build (fully autonomous, free plan at launch). Aurora remains the AWS-path option ([09 §4](09-aws-architecture.md#4-database)). |
+| Q2 | Legacy data to migrate? | None: design migration only. |
+| Q3 | Fate of `Adron/collectorstunetracker_db` | **Delete.** History preserved in `/legacy/database`. Waiting on a `gh` token with `delete_repo`. |
+| Q4 | Billing | Free in v1 with storage quotas; billing later. Listings carry no payments in v1. |
+| Q5 | License | Proprietary, all rights reserved. |
+| Q6 | Old branches | Delete `adding-project-skeleton-defaults` and `release` (you). `collectors_tracker_docs` goes when the new site ships. |
+| Q7 | Look & feel | Punk-zine everywhere. **Updated 2026-11-12:** 5 dark + 5 light themes approved; users pick a mode (System/Light/Dark) plus one light and one dark theme ([02 §3.7](02-brand-and-design.md#37-the-theme-system)). |
+| Q8 | Image processing | Node + **sharp** inside Vercel functions (the Go/libvips option only mattered for AWS Lambda). |
+| Q9 | Domain | `collectorstunetracker.com` = marketing site; `app.collectorstunetracker.com` = the app. **Stays at Vercel**; the purchase must be completed first ([08 §5](08-hosting-costs-and-scaling.md#5-domain-collectorstunetrackercom)). |
+| Q10 | Relationship to Substratal | Standalone customer app, `admin-ctt@thrashingcode.com`, Collectors' Tune Tracker org, public API only. |
+| Q13 | Sibling `shows` repo | Unrelated. |
+| Q15 | AWS accounts | Deferred: only matters if the AWS path is taken ([09](09-aws-architecture.md)). |
+| Q19 | Hosting | **Vercel (team `ctt-a-team`, Pro) + Neon + Vercel Blob** for launch; AWS pieces only when the triggers in [08 §4](08-hosting-costs-and-scaling.md#4-when-to-move-what) are hit. |
+| Q21 | Organization & privacy model | Collections → nested groups → items, plus crates; visibility at profile, collection, group, and item level, with inheritance ([01 §5.9](01-product-spec.md#59-visibility--privacy-profile--collection--group--item)). |
 
 ## Still open
 
 | # | Question | Working assumption |
 |---|---|---|
-| **Q8** | Image worker: **Go + libvips** (consistent, harder packaging) or **Node + sharp** (easier HEIC/AVIF, second language)? | Go + libvips in a Lambda container image; switch if packaging costs more than 2 days. |
-| **Q12** | Shared, moderated catalog vs per-user catalog? | Global catalog seeded from MusicBrainz; user-created releases private until submitted. |
-| **Q14** | Native mobile this year, or PWA only? | PWA only until Phase 4. |
-| **Q15** | AWS accounts. The Aurora cluster lives in Substratal's account. Should CTT run in that **same account**, or in its own accounts that assume a narrow cross-account role for the Data API? | Own CTT accounts (dev/prod) in the same AWS Organization, plus a cross-account role in the Substratal account that allows `rds-data` on the cluster and reads only `ctt/*` secrets. |
-| **Q16** | **Hosted sign-in page.** `auth.substratalapps.com/authorize` isn't live, and self-registered apps can't use embedded login. When will the Substratal dashboard and hosted page ship? | CTT Phase 0 builds the full PKCE flow against the published contract. End-to-end login waits on the page. **No embedded-login workaround.** |
-| **Q17** | Does `collectorstunetracker.com` need email of its own (e.g. a `support@` address for the marketing site)? The managing account now uses `admin-ctt@thrashingcode.com`, so Substratal signup no longer depends on it. | Not needed for launch; revisit when the support page ships. |
-| **Q18** | Copyright holder name in `LICENSE`: you personally, or a company (e.g. Composite Code)? | "Adron Hall" for now. |
+| **Q11** | Backend language. Go was chosen for AWS Lambda; on Vercel, **TypeScript** everywhere (Next.js route handlers) is simpler. OK to switch? | **TypeScript** ([04 §5](04-architecture.md#5-stack)). |
+| **Q12** | Shared, moderated catalog vs per-user catalog? | Shared lazy catalog seeded from MusicBrainz; user-created releases private until submitted. |
+| **Q14** | Native mobile this year, or PWA only? | PWA only. |
+| **Q16** | Substratal's hosted sign-in page (`auth.substratalapps.com/authorize`) isn't live, and customer apps can't use embedded login. When will it ship? | Build with a mock; switch to real login when it's live. No workaround. |
+| **Q17** | Does `collectorstunetracker.com` need its own email (e.g. `support@`)? | Not for launch. |
+| **Q18** | Copyright holder in `LICENSE`: you or a company? | "Adron Hall". |
+| **Q20** | Market rules: allow **trades** of unofficial items (bootlegs, homemade copies)? Allowed countries? Minimum seller account age? | No sale of unofficial items; trades of them off for now; any country; verified email required. |
+| **Q22** | Should public profile pages be indexable by search engines by default? | Off by default; opt in per profile. |
+| **Q23** | Message notifications: Substratal notifications (push/in-app) only, or also email? If email, through Substratal or a separate provider (e.g. Resend)? | Substratal notifications first; email decided before Phase 4. |
+| **Q24** | Should the AWS scale-out start with the media move once image traffic passes ~1 TB/month? | Yes ([08 §4](08-hosting-costs-and-scaling.md#4-when-to-move-what)). |

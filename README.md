@@ -13,19 +13,24 @@ grade it, value it — then follow the people, labels, and pressings that connec
 
 | Doc | What's in it |
 |---|---|
-| [01 — Product Spec](docs/spec/01-product-spec.md) | Vision, personas, formats & collection kinds, features, images, NFRs |
-| [02 — Brand & Design](docs/spec/02-brand-and-design.md) | Marks, palette, type, components, motion, voice, accessibility |
-| [03 — Domain & Data Model](docs/spec/03-domain-and-data-model.md) | Catalog vs. copy, entities, RLS tenancy, legacy mapping |
-| [04 — Architecture](docs/spec/04-architecture.md) | AWS + Substratal Apps platform, auth, DB, image pipeline, repo layout |
-| [05 — Build Plan](docs/spec/05-build-plan.md) | Audit of what exists, consolidation steps, phased roadmap |
+| [01 — Product Spec](docs/spec/01-product-spec.md) | Vision, formats, collections & groups, visibility, sell & trade, themes, images |
+| [02 — Brand & Design](docs/spec/02-brand-and-design.md) | Marks, palette, the 10-theme system, type, components, voice |
+| [03 — Domain & Data Model](docs/spec/03-domain-and-data-model.md) | Catalog vs. copy, groups, effective visibility, market, RLS |
+| [04 — Architecture](docs/spec/04-architecture.md) | Vercel + Neon + Blob, Substratal identity, jobs, caching |
+| [05 — Build Plan](docs/spec/05-build-plan.md) | Audit, consolidation steps, phases |
 | [06 — Open Questions](docs/spec/06-open-questions.md) | Decisions made and still pending |
+| [07 — Import & Export](docs/spec/07-import-export.md) | Discogs CSV, CTT JSON, schema.org JSON-LD, importers |
+| [08 — Hosting, Costs & Scaling](docs/spec/08-hosting-costs-and-scaling.md) | Blob-only option, Vercel vs. AWS costs, domain, deploy steps |
+| [09 — AWS Architecture](docs/spec/09-aws-architecture.md) | Scale-out reference design |
+
+**Theme lab:** open [`design/themes/index.html`](design/themes/index.html) in a browser.
 
 **Setup runbooks (done by hand):** [Set up CTT on Substratal](docs/setup-on-substratal.md) · [Move the domain to AWS](docs/setup-domain-on-aws.md)
 
 ## Stack (target)
 
-React 19 + Vite PWA · Go on AWS Lambda (arm64) · API Gateway HTTP API · Aurora Serverless v2 PostgreSQL (Data API, RLS) ·
-S3 + CloudFront media pipeline · Terraform · identity, orgs & roles via the **Substratal Apps** platform.
+Next.js + React 19 + TypeScript on **Vercel** · **Neon** PostgreSQL · **Vercel Blob** for images and files ·
+identity, orgs & roles via the **Substratal Apps** platform · documented scale-out path to AWS.
 
 ## Brand
 

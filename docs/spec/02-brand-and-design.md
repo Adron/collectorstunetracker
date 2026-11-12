@@ -131,8 +131,7 @@ as the record shop after hours and light mode as a fresh photocopy on cream stoc
 Rules:
 - Every screen in both modes must pass a "would this look at home stapled into a zine?" review. If a screen looks
   like a generic SaaS dashboard, it isn't done.
-- Mode comes from, in order: the user's CTT setting (`theme`: system/dark/light) → the light/dark bit of Substratal's
-  `sub_theme` cookie → `prefers-color-scheme` → dark. **Hub theme names and palettes are ignored**, by design.
+- Mode and theme selection are covered in §3.7. **Substratal Hub theme names and palettes are ignored**, by design.
 - The marketing site (`collectorstunetracker.com`) leads with the loud zine wordmark and the animated GIF marks.
   The app (`app.collectorstunetracker.com`) leads with the sleeve badge and saves the loud zine moments for heroes,
   empty states, and celebrations.
@@ -140,9 +139,52 @@ Rules:
 Condition grades get fixed semantic colors (used as small chips, always with the text label):
 `M/NM` teal · `VG+/VG` mustard · `G+/G` signal · `F/P` muted.
 
-> **Substratal theme cookie:** the Substratal Hub shares light/dark preference via the `sub_theme` cookie.
-> CTT honors only its **light/dark** bit and maps it to Back Room / Cream Sleeve — CTT keeps its own
-> palette rather than adopting Hub themes (see open question Q7).
+> **Correction (2026-11-12):** an earlier draft said CTT would read Substratal's `sub_theme` cookie. It can't:
+> that cookie belongs to `substratalapps.com`, and browsers never send it to `collectorstunetracker.com`.
+> CTT's own setting (§3.7) is the source of truth, with the device's light/dark setting as the fallback.
+
+### 3.7 The theme system
+
+The palette tables above (§3.1–3.6) were the starting point. The shipped theme set is the **ten themes** in
+[`/design/themes/themes.css`](../../design/themes/themes.css), previewed in
+[`/design/themes/index.html`](../../design/themes/index.html) with live contrast checks. All pass WCAG AA.
+
+| Dark | Character | Light | Character |
+|---|---|---|---|
+| **D1 Back Room** (default) | Charcoal, cream, teal | **L1 Cream Sleeve** (default) | Cream stock, charcoal ink, deep teal |
+| **D2 Spray Can** | Pure black, signal orange, hard offset shadows | **L2 Photocopy** | Copy-shop paper, black toner, red stamp |
+| **D3 Basement Show** | Smoke grey, mustard | **L3 Newsprint** | Warm grey pulp, serif headlines, mustard highlighter |
+| **D4 Riso Night** | Teal + fluoro orange riso inks, out of register | **L4 Riso Day** | Cream stock, teal + orange riso inks |
+| **D5 Xerox Black** | Monochrome toner, one orange stamp | **L5 Gig Flyer** | Mustard flyer, charcoal ink, cream paste-ups |
+
+Each theme is a block of tokens on `[data-theme="<id>"]`: background and surface colors, text and muted text,
+accent / hot / warm colors with their on-colors, ransom-tile colors, focus ring, grain amount and blend mode, tape
+color, card shadow (offset and misregistration), tilt, radius, rule weight, display and eyebrow fonts, and the logo
+variants to use. Components only use the tokens, never raw colors.
+
+**How the active theme is chosen**
+
+| Setting (saved per user) | Values | Default |
+|---|---|---|
+| `theme_mode` | `system` · `light` · `dark` | `system` |
+| `theme_light` | `cream-sleeve` · `photocopy` · `newsprint` · `riso-day` · `gig-flyer` | `cream-sleeve` |
+| `theme_dark` | `back-room` · `spray-can` · `basement-show` · `riso-night` · `xerox-black` | `back-room` |
+
+- `light` → use `theme_light`. `dark` → use `theme_dark`. `system` → use `theme_dark` when
+  `prefers-color-scheme: dark` matches, otherwise `theme_light`, and switch live when the device setting changes.
+- **Where it's stored:** in the user's account (Substratal per-app settings for `app_ctt`, so it follows them to every
+  device), mirrored to a first-party `ctt_theme` cookie on `app.collectorstunetracker.com` so the server can render
+  the right theme on the first byte.
+- **No flash of the wrong theme:** for `light` and `dark` the server renders `data-theme` directly from the cookie. For
+  `system`, a tiny inline script in `<head>` runs before first paint, checks `prefers-color-scheme`, and sets
+  `data-theme`. Supporting browsers also get the `Sec-CH-Prefers-Color-Scheme` client hint, so the server can usually
+  get it right without the script.
+- **Signed out** (marketing site, public pages, sign-in): mode `system` with the default pair. A public shelf can opt in
+  to showing its owner's themes.
+- Every theme sets the CSS `color-scheme`, so form controls, scrollbars and the browser's own UI match, and updates
+  `<meta name="theme-color">` to the theme's background.
+- Accessibility guardrails: the contrast pairs from the theme lab run in CI against the token file; `prefers-reduced-motion`
+  removes tilts and wobble in every theme; `prefers-contrast: more` falls back to Xerox Black or Photocopy.
 
 ## 4. Typography
 
