@@ -27,7 +27,7 @@
 | C3 | Copy logo assets from `collectors_tracker_docs` into `/brand/logo` | ✅ done |
 | C4 | Spec docs `/docs/spec/01–09`, runbooks, README | ✅ done |
 | C5 | Delete GitHub repo `Adron/collectorstunetracker_db` (Q3) | ⏳ needs a `gh` token with `delete_repo` scope, or delete it on GitHub |
-| C6 | Remove the CRA prototype (`src/`, `public/`, `package*.json`) when the Phase 0 scaffold lands | ⏳ Phase 0 |
+| C6 | Remove the CRA prototype (`src/`, `public/`, `package*.json`) | ✅ done (Phase 0) |
 | C7 | Delete branches `adding-project-skeleton-defaults` and `release` | ⏳ you: `git push origin --delete adding-project-skeleton-defaults release` |
 | C7b | Delete `collectors_tracker_docs` once the new marketing site is live | ⏳ Phase 0 exit |
 | C8 | Delete `legacy/` once the new schema is in production | ⏳ Phase 3 |
@@ -43,7 +43,7 @@ Every phase deploys to Vercel previews on each PR and to production on merge. Ea
 matching milestone.
 
 ### Phase 0 — Foundations (≈1–1½ weeks)
-- Turborepo/pnpm monorepo per [04 §4](04-architecture.md#4-repository--projects); remove the CRA prototype.
+- Turborepo + npm workspaces monorepo per [04 §4](04-architecture.md#4-repository--projects); remove the CRA prototype.
 - Vercel projects `ctt-site` and `ctt-app` in `ctt-a-team`; Neon integration (Free, `us-east-1`, preview branches);
   Blob store; environment variables; `CRON_SECRET`.
 - CI (GitHub Actions): lint, typecheck, Vitest, Playwright + axe against previews, migrations against Postgres 16 in Docker.

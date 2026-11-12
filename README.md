@@ -5,9 +5,42 @@
 **The crate-digger's logbook.** Catalog every record, CD, tape, poster, and ticket stub you own — photograph it,
 grade it, value it — then follow the people, labels, and pressings that connect one piece of music to the next.
 
-> 🚧 **Re-platforming in progress (Nov 2026).** This repo is being rebuilt from the spec in [`docs/spec`](docs/spec).
-> The old Create-React-App prototype in `src/` is slated for removal, and the former
-> `collectorstunetracker_db` repo now lives in [`legacy/database`](legacy/database) for reference.
+> 🚧 **Phase 0 build in progress (Nov 2026).** The app is being rebuilt from the spec in [`docs/spec`](docs/spec).
+> The former `collectorstunetracker_db` repo lives in [`legacy/database`](legacy/database) for reference.
+
+## Run it locally
+
+Requirements: Node 22+ (24 recommended, see `.nvmrc`) and PostgreSQL 16+ (Postgres.app or Docker).
+
+```bash
+npm install                      # installs every workspace
+cp .env.example apps/web/.env.local
+createdb ctt_dev                 # once
+DATABASE_URL=postgres://localhost:5432/ctt_dev npm run db:migrate
+
+npm run dev                      # app → http://localhost:3000 · marketing site → http://localhost:3001
+npm run dev:web                  # just the app
+npm run dev:site                 # just the marketing site
+```
+
+| Command | What it does |
+|---|---|
+| `npm test` | Unit tests, theme contrast checks (all 10 themes), and migration tests (set `TEST_DATABASE_URL` to run those) |
+| `npm run typecheck` | TypeScript across all workspaces |
+| `npm run build` | Production builds of both apps |
+| `npx playwright test` (in `apps/web`) | End-to-end tests (theme selection, no-flash), desktop + mobile, using your installed Chrome |
+| `npm run db:migrate` / `npm run db:reset` | Apply migrations / drop and re-apply CTT's schemas (local only) |
+
+### Layout
+
+| Path | What |
+|---|---|
+| `apps/web` | `app.collectorstunetracker.com`: the Next.js app |
+| `apps/site` | `collectorstunetracker.com`: the static marketing site |
+| `packages/ui` | The 10 zine themes, theme selection logic, and shared components |
+| `packages/core` | Domain rules (visibility, listings), with no framework dependencies |
+| `packages/db` | SQL migrations, migration runner, Drizzle schema and client |
+| `design/themes` | The theme lab: open `index.html` to preview every theme |
 
 ## Specification
 
