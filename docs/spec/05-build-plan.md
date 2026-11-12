@@ -79,7 +79,7 @@ matching milestone.
 
 ### Phase 4 — Sell & trade (≈1½–2 weeks)
 - Listings (sale / trade / both), snapshots, status flow, expiry; Market page with filters; seller listings on profiles.
-- Conversations and messages; notifications through Substratal; reporting and a moderation queue; rate limits; the
+- Conversations and messages; email notifications via Resend (push later, with mobile); reporting and a moderation queue; rate limits; the
   unofficial-items rule.
 - Terms of service and listing rules pages.
 - **Exit:** public launch candidate.

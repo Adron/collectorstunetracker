@@ -23,6 +23,7 @@
 | Images, import uploads, export archives | **Vercel Blob** (private store) |
 | Sign-up, sign-in, MFA, account recovery, per-user settings (theme), notifications | **Substratal Apps** (`app_ctt`), public API only |
 | Domain & DNS | **Vercel Domains** for `collectorstunetracker.com` (registrar move to AWS only if/when the AWS path is taken) |
+| Email (message and listing notifications) | **Resend** via the Vercel Marketplace, sent from `mail.collectorstunetracker.com` |
 | External catalog data | MusicBrainz, Cover Art Archive, Discogs, gnudb (rate-limited, cached) |
 
 ## 3. System diagram

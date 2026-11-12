@@ -17,19 +17,21 @@
 | Q13 | Sibling `shows` repo | Unrelated. |
 | Q15 | AWS accounts | Deferred: only matters if the AWS path is taken ([09](09-aws-architecture.md)). |
 | Q19 | Hosting | **Vercel (team `ctt-a-team`, Pro) + Neon + Vercel Blob** for launch; AWS pieces only when the triggers in [08 §4](08-hosting-costs-and-scaling.md#4-when-to-move-what) are hit. |
+| Q11 | Backend language | **TypeScript** everywhere (Next.js on Vercel). No Go. |
+| Q20 | Unofficial items in the market | **Trades allowed**; sales still blocked (`sale` / `sale_or_trade` listings can't be created for unofficial items). |
+| Q23 | Notifications | **Email** for messages and listing activity now, through **Resend** (Vercel Marketplace integration) unless decided otherwise. Push notifications come later with the mobile apps. |
 | Q21 | Organization & privacy model | Collections → nested groups → items, plus crates; visibility at profile, collection, group, and item level, with inheritance ([01 §5.9](01-product-spec.md#59-visibility--privacy-profile--collection--group--item)). |
 
 ## Still open
 
 | # | Question | Working assumption |
 |---|---|---|
-| **Q11** | Backend language. Go was chosen for AWS Lambda; on Vercel, **TypeScript** everywhere (Next.js route handlers) is simpler. OK to switch? | **TypeScript** ([04 §5](04-architecture.md#5-stack)). |
 | **Q12** | Shared, moderated catalog vs per-user catalog? | Shared lazy catalog seeded from MusicBrainz; user-created releases private until submitted. |
 | **Q14** | Native mobile this year, or PWA only? | PWA only. |
 | **Q16** | Substratal's hosted sign-in page (`auth.substratalapps.com/authorize`) isn't live, and customer apps can't use embedded login. When will it ship? | Build with a mock; switch to real login when it's live. No workaround. |
 | **Q17** | Does `collectorstunetracker.com` need its own email (e.g. `support@`)? | Not for launch. |
 | **Q18** | Copyright holder in `LICENSE`: you or a company? | "Adron Hall". |
-| **Q20** | Market rules: allow **trades** of unofficial items (bootlegs, homemade copies)? Allowed countries? Minimum seller account age? | No sale of unofficial items; trades of them off for now; any country; verified email required. |
+| **Q20b** | Market rules: allowed countries? Minimum seller account age? | Any country; verified email required; no minimum age. |
 | **Q22** | Should public profile pages be indexable by search engines by default? | Off by default; opt in per profile. |
-| **Q23** | Message notifications: Substratal notifications (push/in-app) only, or also email? If email, through Substratal or a separate provider (e.g. Resend)? | Substratal notifications first; email decided before Phase 4. |
+| **Q25** | Email provider: Resend (assumed) or something else? Sending domain `mail.collectorstunetracker.com` needs DNS records once the domain is registered. | Resend. |
 | **Q24** | Should the AWS scale-out start with the media move once image traffic passes ~1 TB/month? | Yes ([08 §4](08-hosting-costs-and-scaling.md#4-when-to-move-what)). |

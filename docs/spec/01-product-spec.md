@@ -223,12 +223,11 @@ Collectors can put items up for sale, trade, or either, without making the rest 
   Marking a listing sold or traded moves the item to a *Sold & traded* archive (private, kept for history).
 - **Discover:** a Market page lists active listings, with filters for format, genre, decade, grade, price range,
   sale vs. trade, and ships-to country. Each seller's listings also appear on their profile, if it's public.
-- **Contact:** "I'm interested" opens an in-app message thread between buyer and seller, with an email/push
-  notification. There's no payment, escrow, or shipping in v1: the two people settle it themselves, and the
+- **Contact:** "I'm interested" opens an in-app message thread between buyer and seller, with an **email**
+  notification (push notifications later, with the mobile apps). There's no payment, escrow, or shipping in v1: the two people settle it themselves, and the
   listing page says so plainly.
 - **Trust & safety:** report a listing; rate limits on new listings and messages; sellers must have a verified email;
-  **items marked unofficial (bootlegs, homemade copies) can't be listed for sale** (trades of unofficial items are a
-  later decision, Q20). Listings must follow the terms of service.
+  **items marked unofficial (bootlegs, homemade copies) can't be listed for sale**, but they can be listed for trade. Listings must follow the terms of service.
 - **Later:** offers and counter-offers, Stripe Connect payments, buyer/seller feedback, Discogs listing sync.
 
 ### 5.11 Appearance: themes
