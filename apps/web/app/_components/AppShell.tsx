@@ -25,6 +25,7 @@ export function AppShell({ children, current }: { children: ReactNode; current?:
             </Link>
           ))}
         </nav>
+        <Link href="/help" className="mainnav-link help-link" aria-current={current?.startsWith("/help") ? "page" : undefined}>Help</Link>
         <Link href="/add" className="btn btn-accent add-btn">+ Add</Link>
       </header>
       <Drips />
