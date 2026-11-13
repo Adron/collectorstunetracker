@@ -24,3 +24,6 @@ test-results/
 .idea/
 .vscode/
 *.log
+
+# brand kit font cache (brand/scripts/build_brand.py downloads these)
+brand/.cache/
