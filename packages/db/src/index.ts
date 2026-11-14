@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+import { withVerifiedSsl } from "./connection.ts";
 import * as schema from "./schema.ts";
 
 export { schema };
@@ -10,7 +11,7 @@ let pool: pg.Pool | undefined;
 export function getDb() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set");
-  pool ??= new pg.Pool({ connectionString: url, max: 5, idleTimeoutMillis: 10_000 });
+  pool ??= new pg.Pool({ connectionString: withVerifiedSsl(url), max: 5, idleTimeoutMillis: 10_000 });
   return drizzle(pool, { schema });
 }
 

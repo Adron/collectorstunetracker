@@ -9,6 +9,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
+import { withVerifiedSsl } from "./connection.ts";
 
 if (process.argv.includes("--build") && process.env.VERCEL_ENV !== "production") {
   console.log(`migrate: skipped (build for ${process.env.VERCEL_ENV ?? "local"})`);
@@ -24,7 +25,7 @@ if (!url) {
 const dir = fileURLToPath(new URL("../migrations/", import.meta.url));
 const SCHEMAS = ["app", "catalog", "collection", "market", "media", "ingest"];
 
-const client = new pg.Client({ connectionString: url });
+const client = new pg.Client({ connectionString: withVerifiedSsl(url) });
 await client.connect();
 try {
   if (process.argv.includes("--reset")) {

@@ -18,7 +18,11 @@
         "NEXT_PUBLIC_*"
       ],
       "passThroughEnv": [
-        "BLOB_READ_WRITE_TOKEN"
+        "BLOB_READ_WRITE_TOKEN",
+        "PG*",
+        "POSTGRES_*",
+        "NEON_*",
+        "VITE_NEON_*"
       ]
     },
     "dev": {
