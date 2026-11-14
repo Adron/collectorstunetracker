@@ -201,7 +201,7 @@ effective(item) =
 |---|---|
 | `the_system.tenants` | **Replaced** by Substratal organizations/tenants |
 | `the_system.users` (plaintext seed password `changeThis!`) | **Dropped** — identity moves to Substratal; no passwords ever stored in CTT |
-| `the_system.roles` (`can_add/can_edit/can_delete`) | **Replaced** by Substratal app roles + permissions: `app.ctt.collection.read`, `app.ctt.collection.write`, `app.ctt.collection.delete`, `app.ctt.catalog.edit`, `app.ctt.catalog.moderate`, `app.ctt.admin` |
+| `the_system.roles` (`can_add/can_edit/can_delete`) | **Replaced** by Substratal app roles + permissions: `app.collectors-tune-tracker.collection.read`, `app.collectors-tune-tracker.collection.write`, `app.collectors-tune-tracker.collection.delete`, `app.collectors-tune-tracker.catalog.edit`, `app.collectors-tune-tracker.catalog.moderate`, `app.collectors-tune-tracker.admin` |
 | `the_system.user_roles` | **Replaced** by Substratal `/users/{id}/roles` |
 | `the_collections` schema (empty) | **Becomes** the `ctt` database with the schemas above |
 | `notes` / `message` columns on every table | Dropped as a convention; per-entity `notes_md` where it's meaningful |

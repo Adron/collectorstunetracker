@@ -21,7 +21,7 @@
 | Hosting, SSR, API routes, CDN, preview deployments, cron | **Vercel** (team `ctt-a-team`, Pro) |
 | Relational data (catalog, collections, visibility, market, jobs, sessions) | **Neon** Postgres 16+, project `ctt`, connected through the Vercel Marketplace integration |
 | Images, import uploads, export archives | **Vercel Blob** (private store) |
-| Sign-up, sign-in, MFA, account recovery, per-user settings (theme), notifications | **Substratal Apps** (`app_ctt`), public API only |
+| Sign-up, sign-in, MFA, account recovery, per-user settings (theme), notifications | **Substratal Apps** (`app_collectors-tune-tracker`), public API only |
 | Domain & DNS | **Vercel Domains** for `collectorstunetracker.com` (registrar move to AWS only if/when the AWS path is taken) |
 | Email (message and listing notifications) | **Resend** via the Vercel Marketplace, sent from `mail.collectorstunetracker.com` |
 | External catalog data | MusicBrainz, Cover Art Archive, Discogs, gnudb (rate-limited, cached) |
@@ -102,7 +102,7 @@ collectorstunetracker/
 
 ## 6. Authentication (Substratal, unchanged in substance)
 
-- `GET /api/auth/login` → redirect to Substratal's hosted authorize page (authorization code + PKCE, `client_id=app_ctt`,
+- `GET /api/auth/login` → redirect to Substratal's hosted authorize page (authorization code + PKCE, `client_id=app_collectors-tune-tracker`,
   `redirect_uri=https://app.collectorstunetracker.com/api/auth/callback`).
 - `GET /api/auth/callback` → exchange the code at `/auth/oauth/token` → create a row in `app.session` (refresh token
   encrypted at rest with a key in Vercel environment variables) → set `ctt_session` (HttpOnly, Secure, SameSite=Lax,
@@ -192,9 +192,9 @@ Per [02 §3.7](02-brand-and-design.md#37-the-theme-system):
 
 | Env | Where | Database | Blob | Substratal app |
 |---|---|---|---|---|
-| Local | `pnpm dev` | Docker Postgres 16 (or the Neon `dev` branch) | Blob dev store, or a local filesystem `MediaStore` | `app_ctt-dev` + local auth mock |
-| Preview | Vercel preview per PR | Neon branch per preview | Blob preview store | `app_ctt-dev` |
-| Production | Vercel production (`main`) | Neon `main` | Blob production store | `app_ctt` |
+| Local | `pnpm dev` | Docker Postgres 16 (or the Neon `dev` branch) | Blob dev store, or a local filesystem `MediaStore` | local auth mock |
+| Preview | Vercel preview per PR | Neon branch per preview | Blob preview store | local auth mock (preview URLs change, so they can't be redirect URIs) |
+| Production | Vercel production (`main`) | Neon `main` | Blob production store | `app_collectors-tune-tracker` |
 
 Secrets live in Vercel environment variables (`vercel env pull` for local): `DATABASE_URL*`, `BLOB_READ_WRITE_TOKEN`,
 `SUBSTRATAL_API_KEY`, `SUBSTRATAL_WEBHOOK_SECRET`, `SESSION_ENCRYPTION_KEY`, `CRON_SECRET`.
