@@ -4,6 +4,7 @@ import { withVerifiedSsl } from "./connection.ts";
 import * as schema from "./schema.ts";
 
 export { schema };
+export { applyWebhook, type WebhookActions, type WebhookOutcome } from "./webhooks.ts";
 
 let pool: pg.Pool | undefined;
 

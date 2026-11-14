@@ -38,7 +38,7 @@ If CTT later gets a fixed staging URL, or needs real sign-in on localhost, regis
 | 6 Icon | ✅ Uploaded through the dashboard, 2026-11-14 |
 | — Support URL | ✅ `/support` page on the marketing site (`apps/site/app/support`) |
 | 7 Backend API key | ✅ `ctt-backend-prod`, in Vercel `ctt-app` as `SUBSTRATAL_API_KEY` (Production), 2026-11-14 |
-| 8 Webhook | ⏸️ Waits for the `/api/hooks/substratal` route to be deployed |
+| 8 Webhook | ⏳ Route built (`apps/web/app/api/hooks/substratal`); subscribe once it's deployed |
 | 9 Grant yourself access | ✅ `ent_01M7CS635VZ7YFNMS1Z4Y1VPJG` (`admin_grant`) + `role_collectors-tune-tracker_admin`, 2026-11-14 |
 | Hosted sign-in page | ⛔ `auth.substratalapps.com` still doesn't respond (checked 2026-11-14) |
 
@@ -246,11 +246,32 @@ curl -sS -X POST $API/webhooks -H "$V" -H "$AUTH" -H "Content-Type: application/
 }' | jq '{id, signing_secret, status}'
 ```
 
-- [ ] Store the `signing_secret` (`whsec_…`) and add it to Vercel as `SUBSTRATAL_WEBHOOK_SECRET` (Production).
-      It's never shown again; use `rotate-secret` if it's lost.
-- **Wait for this step.** The URL must resolve to a public IP **at creation time**, so it needs the domain
-  registered, `app.collectorstunetracker.com` attached to `ctt-app`, and the `/api/hooks/substratal` route
-  deployed. Then use `POST /webhooks/{id}/test` to confirm delivery.
+What the endpoint (`apps/web/app/api/hooks/substratal/route.ts`) does with each event:
+
+| Event | CTT |
+|---|---|
+| `access.revoked`, `role.removed`, `user.suspended` | Ends all of that user's CTT sessions; signing in again re-runs Substratal's checks |
+| `user.deleted` | Ends their sessions and queues a `purge.user` job |
+| Everything else, and events about another app | Recorded and acknowledged (`200`), nothing else |
+
+Every event id is recorded once (`app.webhook_delivery`), so retries and redeliveries are no-ops. A bad or stale
+signature (over 5 minutes old) gets `401`. With no secret configured it answers `503`, which Substratal retries.
+
+Order matters, because the secret only exists after the subscription is created:
+
+1. [ ] Create the subscription (above). Keep the response in a variable so the secret isn't printed:
+       `HOOK=$(curl … )`, then `echo "$HOOK" | jq '{id, status, events}'`.
+2. [ ] Save the secret to your password manager (`echo "$HOOK" | jq -r .signing_secret | pbcopy`), then add it
+       to Vercel. It's never shown again; use `rotate-secret` if it's lost.
+       `echo "$HOOK" | jq -r .signing_secret | tr -d '\n' | vercel env add SUBSTRATAL_WEBHOOK_SECRET --environment production --sensitive`
+       (run in `apps/web`, which is linked to `ctt-app`).
+3. [ ] **Redeploy production** so the function picks up the new variable: `vercel redeploy https://app.collectorstunetracker.com`
+       from `apps/web`, or Redeploy in the dashboard. Until then, deliveries get `503` and are retried.
+4. [ ] Send a test event, then look at the delivery: `POST /webhooks/{id}/test`, then
+       `GET /webhooks/{id}/deliveries`. The latest should be `succeeded` with response `200`.
+
+During a secret rotation, set `SUBSTRATAL_WEBHOOK_SECRET` to `new,old` (comma-separated) until
+`previous_secret_expires_at` passes, then to just the new secret.
 
 ## 9. After approval: grant yourself access
 

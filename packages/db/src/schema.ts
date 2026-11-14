@@ -31,6 +31,12 @@ export const job = app.table("job", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const webhookDelivery = app.table("webhook_delivery", {
+  id: text("id").primaryKey(),
+  eventType: text("event_type").notNull(),
+  receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const collector = collection.table("collector", {
   sub: text("sub").primaryKey(),
   handle: text("handle").notNull(),
