@@ -127,17 +127,17 @@ of the `MediaStore` interface, that's a few days of work, not a re-platform.
 
 ## 5. Domain: `collectorstunetracker.com`
 
-**Current state:** the domain shows in the Vercel `ctt-a-team` team as **"Purchase in Process"**, and the `.com` registry
-has no record of it (RDAP 404, NXDOMAIN). **The purchase never completed.** The name appears to be unregistered and available.
+**Registered 2026-11-13** at Vercel (team `ctt-a-team`), auto-renewing yearly at $12.03, expiring 2027-11-13;
+nameservers `ns1/ns2.vercel-dns.com`. The original Dec 2023 purchase had stalled at "Purchase in Process" without
+ever reaching the registry. `vercel domains buy` replaced the stuck entry, though the CLI reported `unknown_outcome`
+and the registration only appeared about 7 minutes later. If that happens again, check `vercel domains inspect`
+and the registry before retrying, so you aren't charged twice.
 
-1. In the Vercel dashboard (team `ctt-a-team` → Domains), open `collectorstunetracker.com`. Retry or cancel the stuck
-   purchase; if it won't clear, contact Vercel support and reference the pending purchase. (The Pro "free first-year domain"
-   offer doesn't include `.com`.)
-2. Once registered, add it to projects:
+1. Attach it to the projects:
    - `collectorstunetracker.com` → `ctt-site`, and `www.collectorstunetracker.com` → 308 redirect to the apex;
    - `app.collectorstunetracker.com` → `ctt-app`.
-3. Vercel DNS handles the certificates automatically. Add mail records later only if the domain needs its own email (Q17).
-4. Keep the domain at Vercel. [`setup-domain-on-aws.md`](../setup-domain-on-aws.md) applies only if CTT later moves fully to AWS.
+2. Vercel DNS handles the certificates automatically. Add mail records later only if the domain needs its own email (Q17).
+3. Keep the domain at Vercel. [`setup-domain-on-aws.md`](../setup-domain-on-aws.md) applies only if CTT later moves fully to AWS.
 
 ## 6. Build & deploy on Vercel: what it takes
 

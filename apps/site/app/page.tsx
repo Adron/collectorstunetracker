@@ -1,6 +1,5 @@
-import { Drips, HeroLogo, RansomTitle, SleeveLogo, XXFace } from "@ctt/ui";
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.collectorstunetracker.com";
+import { HeroLogo, RansomTitle, XXFace } from "@ctt/ui";
+import { APP_URL, SiteFooter, SiteHeader } from "./_components/SiteChrome";
 
 const FEATURES = [
   {
@@ -42,19 +41,7 @@ const FORMATS = ["12\" LP", "10\"", "7\"", "Picture disc", "Test pressing", "78"
 export default function Home() {
   return (
     <>
-      <header className="site-top">
-        <a href="/" className="site-brand" aria-label="Collectors' Tune Tracker">
-          <SleeveLogo />
-          <span className="eyebrow">Collectors' Tune Tracker</span>
-        </a>
-        <nav aria-label="Site" className="site-nav">
-          <a href="#features">What it does</a>
-          <a href="#formats">Formats</a>
-          <a href="#privacy">Privacy</a>
-        </nav>
-        <a className="btn btn-ghost" href={APP_URL}>Log in</a>
-      </header>
-      <Drips />
+      <SiteHeader />
 
       <main id="main">
         <section className="site-hero">
@@ -106,11 +93,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="site-foot">
-        <span className="script">Collectors'</span>
-        <span className="muted">© 2024–2026 Collectors' Tune Tracker. Est. 2024.</span>
-        <a href={APP_URL}>Log in</a>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

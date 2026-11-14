@@ -177,7 +177,7 @@ variants to use. Components only use the tokens, never raw colors.
 
 - `light` → use `theme_light`. `dark` → use `theme_dark`. `system` → use `theme_dark` when
   `prefers-color-scheme: dark` matches, otherwise `theme_light`, and switch live when the device setting changes.
-- **Where it's stored:** in the user's account (Substratal per-app settings for `app_ctt`, so it follows them to every
+- **Where it's stored:** in the user's account (Substratal per-app settings for `app_collectors-tune-tracker`, so it follows them to every
   device), mirrored to a first-party `ctt_theme` cookie on `app.collectorstunetracker.com` so the server can render
   the right theme on the first byte.
 - **No flash of the wrong theme:** for `light` and `dark` the server renders `data-theme` directly from the cookie. For

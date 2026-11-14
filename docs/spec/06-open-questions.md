@@ -12,7 +12,7 @@
 | Q6 | Old branches | Delete `adding-project-skeleton-defaults` and `release` (you). `collectors_tracker_docs` goes when the new site ships. |
 | Q7 | Look & feel | Punk-zine everywhere. **Updated 2026-11-12:** 5 dark + 5 light themes approved; users pick a mode (System/Light/Dark) plus one light and one dark theme ([02 §3.7](02-brand-and-design.md#37-the-theme-system)). |
 | Q8 | Image processing | Node + **sharp** inside Vercel functions (the Go/libvips option only mattered for AWS Lambda). |
-| Q9 | Domain | `collectorstunetracker.com` = marketing site; `app.collectorstunetracker.com` = the app. **Stays at Vercel**; the purchase must be completed first ([08 §5](08-hosting-costs-and-scaling.md#5-domain-collectorstunetrackercom)). |
+| Q9 | Domain | `collectorstunetracker.com` = marketing site; `app.collectorstunetracker.com` = the app. **Stays at Vercel**; registered there 2026-11-13 ([08 §5](08-hosting-costs-and-scaling.md#5-domain-collectorstunetrackercom)). |
 | Q10 | Relationship to Substratal | Standalone customer app, `admin-ctt@thrashingcode.com`, Collectors' Tune Tracker org, public API only. |
 | Q13 | Sibling `shows` repo | Unrelated. |
 | Q15 | AWS accounts | Deferred: only matters if the AWS path is taken ([09](09-aws-architecture.md)). |
